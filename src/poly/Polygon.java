@@ -1,6 +1,8 @@
 package poly;
 
+import main.Main;
 import perspective.Camera;
+import screens.PolyScreen;
 import util.Gizmo;
 import util.Vector;
 
@@ -25,6 +27,16 @@ public class Polygon {
         vertices.add(vertex);
     }
 
+    public void addToEdge(Vector point, Edge edge) {
+        for (int i = 0; i < vertices.size(); i++) {
+
+            if (edge.getStart() == vertices.get(i)) {
+                insertPoint(point, i + 1);
+                break;
+            }
+        }
+    }
+
     public boolean pointInside(Vector vector) {
         Edge[] edges = genEdges();
 
@@ -38,7 +50,7 @@ public class Polygon {
         return left % 2 == 1;
     }
 
-    private Edge[] genEdges() {
+    public Edge[] genEdges() {
 
         Edge[] edges = new Edge[vertices.size()];
 
@@ -73,7 +85,8 @@ public class Polygon {
             for (int i = 0; i < xPoints.length; i++) { // TODO
 
                 float progress = (float) (i + 1) / xPoints.length;
-                g.setColor(new Color((int) (255 * progress), 0, (int) (255 * (1 - progress))));
+                //g.setColor(new Color((int) (255 * progress), 0, (int) (255 * (1 - progress))));
+                g.setColor(((PolyScreen) Main.screen).vertSelected(vertices.get(i)) ? Gizmo.midOrange : Gizmo.nearBlack);
                 Gizmo.dot(g, new Vector(xPoints[i], yPoints[i]), 4);
             }
         }

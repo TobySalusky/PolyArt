@@ -28,8 +28,8 @@ public class Main extends JPanel {
     private final Timer timer;
 
 
-    private final List<Screen> screenList = new ArrayList<>();
-    private Screen screen;
+    private static final List<Screen> screenList = new ArrayList<>();
+    public static Screen screen;
 
     public Main() {
 

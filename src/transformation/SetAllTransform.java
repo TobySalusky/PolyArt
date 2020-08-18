@@ -19,7 +19,7 @@ public class SetAllTransform extends Transform {
 	public void apply(List<Vector> verts) {
 		assert verts.size() == vertSave.size();
 		for (int i = 0; i < verts.size(); i++) {
-			verts.set(i, vertSave.get(i));
+			verts.get(i).setTo(vertSave.get(i));
 		}
 	}
 

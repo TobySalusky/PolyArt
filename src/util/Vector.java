@@ -117,6 +117,12 @@ public class Vector {
         resize(mag(), angle);
     }
 
+    public final void rotateAround(float radians, Vector around) {
+        sub(around);
+        rotate(radians);
+        add(around);
+    }
+
     public final void rotate(float radians) {
 
         resize(mag(), angle() + radians);
@@ -127,4 +133,12 @@ public class Vector {
     }
 
     // TODO: dot and cross products
+
+    public final boolean between(Vector from, Vector to) { // BOX COLLISION
+
+        Vector tl = new Vector(Math.min(from.x, to.x), Math.min(from.y, to.y));
+        Vector br = new Vector(Math.max(from.x, to.x), Math.max(from.y, to.y));
+
+        return (x >= tl.x && x <= br.x && y >= tl.y && y <= br.y);
+    }
 }
