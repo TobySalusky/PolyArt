@@ -1,6 +1,7 @@
 package poly;
 
 import main.Main;
+import modifiers.Modifier;
 import perspective.Camera;
 import screens.PolyScreen;
 import util.Gizmo;
@@ -15,6 +16,8 @@ public class Polygon {
     private final List<Vector> vertices = new ArrayList<>(3);
     private Color color;
 
+    private final List<Modifier> modifiers = new ArrayList<>(1);
+
     public Polygon(Color color) {
         this.color = color;
     }
@@ -27,6 +30,10 @@ public class Polygon {
         vertices.add(vertex);
     }
 
+    public void removeAll(List<Vector> verts) {
+        vertices.removeAll(verts);
+    }
+
     public void addToEdge(Vector point, Edge edge) {
         for (int i = 0; i < vertices.size(); i++) {
 
@@ -35,6 +42,16 @@ public class Polygon {
                 break;
             }
         }
+    }
+
+    public Polygon cloneGeom() { // clones polygon without modifiers
+        Polygon copy = new Polygon(color);
+
+        for (Vector vert : vertices) {
+            copy.addPoint(vert.copy());
+        }
+
+        return copy;
     }
 
     public boolean pointInside(Vector vector) {
@@ -62,6 +79,14 @@ public class Polygon {
         return edges;
     }
 
+    public void addModifier(Modifier modifier) {
+        modifiers.add(modifier);
+    }
+
+    public List<Modifier> getModifiers() {
+        return modifiers;
+    }
+
     public void render(Graphics g, Camera camera, boolean renderEdges, boolean renderVerts) {
         g.setColor(color);
 
@@ -74,7 +99,21 @@ public class Polygon {
             yPoints[i] = (int) camera.getRenderY(vert.y);
         }
 
-        g.fillPolygon(xPoints, yPoints, xPoints.length);
+        if (modifiers.size() > 0) { // MODIFIER OUTPUT
+            Polygon[] modified = new Polygon[]{this};
+
+            for (Modifier modifier : modifiers) {
+                modified = modifier.create(modified);
+            }
+
+            for (Polygon polygon : modified) {
+                //if (polygon != this) { NOTE: if caught in infinite loop- you are probably copying this and having it render modifier output infinitely
+                polygon.render(g, camera, false, false);
+                //}
+            }
+        } else {
+            g.fillPolygon(xPoints, yPoints, xPoints.length);
+        }
 
         if (renderEdges) {
             g.setColor(Color.ORANGE);
@@ -90,6 +129,21 @@ public class Polygon {
                 Gizmo.dot(g, new Vector(xPoints[i], yPoints[i]), 4);
             }
         }
+
+        if (modifiers.size() > 0) {
+            for (Modifier modifier : modifiers) { // TODO: give own category
+                modifier.render(g, camera, this);
+            }
+        }
+    }
+
+    public boolean insideRange(Vector from, Vector to) {
+        for (Vector vert : vertices) {
+            if (!vert.between(from, to)) { // not very efficient, finds tl and br each iteration...
+                return false;
+            }
+        }
+        return true;
     }
 
     public Color getColor() {

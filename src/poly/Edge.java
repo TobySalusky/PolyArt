@@ -38,6 +38,10 @@ public class Edge {
         return pointRot.subbed(closest).mag();
     }
 
+    public Vector progressPoint(float progress) { // scales from 0 to 1
+        return start.added(end.subbed(start).multed(progress));
+    }
+
     public boolean eitherIs(Vector point) {
         return  (start == point || end == point);
     }

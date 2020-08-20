@@ -49,6 +49,10 @@ public class Vector {
         return new Vector(x + vec.x, y + vec.y);
     }
 
+    public final Vector added(float x, float y) {
+        return new Vector(x + this.x, y + this.y);
+    }
+
     public final Vector subbed(Vector vec) {
         return new Vector(x - vec.x, y - vec.y);
     }

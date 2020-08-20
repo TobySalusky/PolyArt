@@ -9,15 +9,26 @@ import java.awt.*;
 
 public class FuncButton extends SizedButton {
 
-	private static final Vector defaultSize = new Vector(30, 30);
+	private final Vector defaultSize;
 	private final Func func;
 
-	private boolean hover;
+	protected boolean hover;
 
 	public FuncButton(Func func, float x, float y) {
+		this(func, x, y, 30, 30);
+	}
+
+	public FuncButton(Func func, float x, float y, float width, float height) {
 		this.func = func;
 		pos = new Vector(x, y);
-		size = defaultSize.copy();
+		size = new Vector(width, height);
+		defaultSize = new Vector(width, height);
+	}
+
+	@Override
+	public void mouseAt(Vector pos) {
+		hover = false;
+		super.mouseAt(pos);
 	}
 
 	@Override
@@ -27,18 +38,16 @@ public class FuncButton extends SizedButton {
 
 	@Override
 	public void update() {
-		float newSize = Maths.approach(size.x, (hover) ? defaultSize.x * 1.4F : defaultSize.x, 5);
-		size = new Vector(newSize, newSize);
+		float newX = Maths.approach(size.x, (hover) ? defaultSize.x * 1.4F : defaultSize.x, 8F);
+		float newY = Maths.approach(size.y, (hover) ? defaultSize.y * 1.4F : defaultSize.y, 8F);
 
-		hover = false;
+		size = new Vector(newX, newY);
 	}
 
 	@Override
 	protected void hitAction(Vector mousePos) {
 		func.execute();
-
-		float newSize = defaultSize.x * 0.8F;
-		size = new Vector(newSize, newSize);
+		size = defaultSize.multed(0.8F);
 	}
 
 	protected Color findColor() {

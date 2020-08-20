@@ -17,7 +17,7 @@ public interface Screen {
     }
 
     default void mouseScrollEvent(MouseWheelEvent e) {
-        scrolled(e.getScrollAmount());
+        scrolled(e.getWheelRotation());
     }
 
     default void scrolled(int amount) {

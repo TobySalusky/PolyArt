@@ -68,7 +68,7 @@ public class Main extends JPanel {
     private class MouseWheel implements MouseWheelListener {
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
-
+            screen.mouseScrollEvent(e);
         }
     }
 
