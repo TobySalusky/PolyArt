@@ -17,6 +17,7 @@ public class Polygon {
     private Color color;
 
     private final List<Modifier> modifiers = new ArrayList<>(1);
+    private Polygon[] lastOutput;
 
     public Polygon(Color color) {
         this.color = color;
@@ -42,6 +43,20 @@ public class Polygon {
                 break;
             }
         }
+    }
+
+    public Vector[] findRange() { // returns top-left and bottom-right points of rectangle around polygon
+        Vector min = vertices.get(0);
+        Vector max = vertices.get(0);
+
+        for (int i = 1; i < vertices.size(); i++) {
+            Vector vert = vertices.get(i);
+
+            min = Vector.minEach(min, vert);
+            max = Vector.maxEach(max, vert);
+        }
+
+        return new Vector[] {min, max};
     }
 
     public Polygon cloneGeom() { // clones polygon without modifiers
@@ -111,6 +126,7 @@ public class Polygon {
                 polygon.render(g, camera, false, false);
                 //}
             }
+            lastOutput = modified;
         } else {
             g.fillPolygon(xPoints, yPoints, xPoints.length);
         }
@@ -130,7 +146,7 @@ public class Polygon {
             }
         }
 
-        if (modifiers.size() > 0) {
+        if (modifiers.size() > 0 && renderVerts) {
             for (Modifier modifier : modifiers) { // TODO: give own category
                 modifier.render(g, camera, this);
             }
@@ -156,5 +172,9 @@ public class Polygon {
 
     public List<Vector> getVertices() {
         return vertices;
+    }
+
+    public Polygon[] getLastOutput() {
+        return lastOutput;
     }
 }

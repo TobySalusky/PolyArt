@@ -1,5 +1,7 @@
 package screens;
 
+import com.cedarsoftware.util.io.JsonWriter;
+import jdk.nashorn.internal.ir.debug.JSONWriter;
 import main.Main;
 import modifiers.MirrorModifier;
 import modifiers.SubdivisionModifier;
@@ -10,6 +12,10 @@ import poly.PolyLayer;
 import poly.Polygon;
 import transformation.*;
 import ui.*;
+import ui.panels.MultiPanel;
+import ui.panels.OpenPanel;
+import ui.panels.Panels;
+import ui.panels.UIPanel;
 import util.*;
 
 import java.awt.event.KeyEvent;
@@ -35,10 +41,10 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
     private Tool tool = Tool.easyAdd;
 
     // input
-	private Vector lastMousePos;
+	private Vector lastMousePos = new Vector();
 	private boolean leftClickDown, middleClickDown, rightClickDown;
 	private boolean shiftZoom;
-	private static final Vector shiftZoomPoint = Camera.center;
+	private static final Vector shiftZoomPoint = new Vector(Main.WIDTH / 2F, Main.HEIGHT / 2F);
 
     // non main
 	private final List<Vector> selectedVertices = new ArrayList<>();
@@ -58,6 +64,8 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	private List<Vector> preSelectSelectedVertices;
 	private List<Polygon> preSelectSelectedPolygons;
 
+	private Color selectedColor = Color.WHITE;
+
 	// ui
 	private final List<UIElement> uiElements = new ArrayList<>();
 
@@ -75,11 +83,11 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		screen.addPanel(new UIPanel(UIPanel.VERTICAL, Main.HEIGHT, -100));
 
 		multi.addPanel(new OpenPanel(UIPanel.HORIZONTAL, 0, Main.WIDTH - 200));
-		MultiPanel right = new MultiPanel(UIPanel.HORIZONTAL, 0, -1);
+		MultiPanel right = new MultiPanel(UIPanel.HORIZONTAL, Main.WIDTH, -100);
 
-		right.addPanel(new UIPanel(UIPanel.VERTICAL, 0, 200));
+		right.addPanel(new Panels.ColorPanel(UIPanel.VERTICAL, 0, 200, this));
 		right.addPanel(new UIPanel(UIPanel.VERTICAL, 200, 300));
-		right.addPanel(new UIPanel(UIPanel.VERTICAL, 500, 100));
+		right.addPanel(new Panels.PolySelectPanel(UIPanel.VERTICAL, 500, 100, this));
 		multi.addPanel(right);
 
 		multi.reorder(1, 0);
@@ -104,10 +112,31 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	}
 
     public enum Tool {
-	    select, create, easyAdd;
 
-	    public void switchOff() { // todo?
+	    select {
+			protected void forceMode(PolyScreen screen) {
+				if (screen.editMode() && screen.editPoly == null) {
+					screen.mode = Mode.object;
+				}
+			}
+		}, create {
+			protected void forceMode(PolyScreen screen) {
+				if (screen.objectMode()) {
+					screen.mode = Mode.edit;
+				}
+			}
+		}, easyAdd {
+			protected void forceMode(PolyScreen screen) {
+				if (screen.objectMode()) {
+					screen.mode = Mode.edit;
+				}
+			}
+		};
 
+	    protected void forceMode(PolyScreen screen) {}
+
+	    public void update(PolyScreen screen) {
+	    	forceMode(screen);
 		}
     }
 
@@ -213,11 +242,19 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		}
 	}
 
-	public List<Vector> copyVectorList(List<Vector> verts) {
-    	List<Vector> list = new ArrayList<>();
+	public void colorSelected(Color color) {
+		selectedColor = color;
 
-    	list.addAll(verts);
-    	return list;
+		if (objectMode()) {
+			for (Polygon polygon : selectedPolygons) {
+				polygon.setColor(selectedColor);
+			}
+		}
+	}
+
+	public List<Vector> copyVectorList(List<Vector> verts) {
+
+		return new ArrayList<>(verts);
 	}
 
 	public List<Polygon> copySelectedPolygons() {
@@ -275,12 +312,27 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 			}
 
 			Vector vec = camera.toWorld(mousePos(e));
-			for (PolyLayer layer : layers) {
-				for (Polygon polygon : layer.getPolygons()) {
-					if (polygon.pointInside(vec)) {
-						editPoly = polygon;
-						selectedPolygons.add(editPoly);
-						break;
+			outer:
+			for (int i = layers.size() - 1; i >= 0; i--) {
+				PolyLayer layer = layers.get(i);
+				for (int j = layer.getPolygons().size() - 1; j >= 0; j--) {
+					Polygon polygon = layer.getPolygons().get(j);
+					Polygon[] output = polygon.getLastOutput();
+
+					if (output != null) {
+						for (Polygon out : output) {
+							if (out.pointInside(vec)) {
+								editPoly = polygon; // abstract?
+								selectedPolygons.add(editPoly);
+								break outer;
+							}
+						}
+					} else {
+						if (polygon.pointInside(vec)) {
+							editPoly = polygon;
+							selectedPolygons.add(editPoly);
+							break outer;
+						}
 					}
 				}
 			}
@@ -291,7 +343,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		// EDIT MODE ==============================================================
 		if (using(Tool.create)) { // TODO: to switch
 			if (editPoly == null) {
-				editPoly = new Polygon(Color.WHITE);
+				editPoly = new Polygon(selectedColor);
 				layer.getPolygons().add(editPoly);
 
 				selectedPolygons.clear(); // TODO: ??
@@ -309,7 +361,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 			if (editMode()) {
 
 				if (editPoly == null) {
-					editPoly = new Polygon(Color.WHITE);
+					editPoly = new Polygon(selectedColor);
 					selectedPolygons.add(editPoly);
 					layer.getPolygons().add(editPoly);
 					editPoly.addPoint(worldPos);
@@ -368,6 +420,19 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 			Gizmo.dottedLine(g, camera.toScreen(min.getEnd()), lastMousePos);
 			Gizmo.dot(g, lastMousePos);
 		}
+	}
+
+	public List<PolyLayer> getLayers() {
+    	return layers;
+	}
+
+	public int polygonCount() {
+
+    	int count = 0;
+    	for (PolyLayer layer : layers) {
+    		count += layer.getPolygons().size();
+		}
+    	return count;
 	}
 
 	public boolean using(Tool tool) {
@@ -575,6 +640,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				if (mode == Mode.object) {
 					mode = Mode.edit;
 				} else {
+					tool = Tool.select;
 					mode = Mode.object;
 				}
 				break;
@@ -586,8 +652,12 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				}
 				break;
 
+			case (KeyEvent.VK_B):
+				tool = Tool.easyAdd;
+				break;
+
 			case (KeyEvent.VK_M):
-				editPoly.addModifier(new MirrorModifier(new Axis(new Vector(), Maths.randomAngle())));
+				editPoly.addModifier(new MirrorModifier(new Axis(Vector.zero, Maths.HalfPI)));
 				break;
 			case (KeyEvent.VK_N):
 				editPoly.addModifier(new SubdivisionModifier(3));
@@ -613,6 +683,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				deleteAction();
 				break;
 
+			case (KeyEvent.VK_SPACE):
 			case (KeyEvent.VK_ENTER):
 				enterAction();
 				break;
@@ -629,7 +700,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				scaleStart();
 				break;
 
-			case (KeyEvent.VK_SPACE):
+			/*case (KeyEvent.VK_SPACE):
 				if (editMode()) {
 					if (editType == EditType.verts) {
 						editType = EditType.edges;
@@ -637,7 +708,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 						editType = EditType.verts;
 					}
 				}
-				break;
+				break;*/
 
 			case (KeyEvent.VK_PERIOD):
 				if (numListen) {
@@ -686,7 +757,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	@Override
 	public void mouseDrag(MouseEvent e) {
 
-		Vector delta = (lastMousePos == null) ? new Vector() : mousePos(e).subbed(lastMousePos);
+		Vector delta = mousePos(e).subbed(lastMousePos);
 		lastMousePos = mousePos(e);
 
 		if (middleClickDown) { // camera pan and shift-zoom
@@ -721,14 +792,30 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				}
 			} else { // object mode
 
+				editPoly = null;
+
 				selectedPolygons.clear();
 				selectedPolygons.addAll(preSelectSelectedPolygons);
 
 				for (PolyLayer layer : layers) {
-					for (Polygon polygon : layer.getPolygons()) {
-						if (polygon.insideRange(selectStart, selectEnd)) {
-							selectedPolygons.add(polygon);
-							editPoly = polygon;
+					poly:
+					for (Polygon polygon : layer.getPolygons()) { // fix arbitrary order please
+
+						Polygon[] output = polygon.getLastOutput();
+
+						if (output != null) {
+							for (Polygon out : output) {
+								if (out.insideRange(selectStart, selectEnd)) {
+									selectedPolygons.add(polygon);
+									editPoly = polygon;
+									continue poly;
+								}
+							}
+						} else {
+							if (polygon.insideRange(selectStart, selectEnd)) {
+								selectedPolygons.add(polygon);
+								editPoly = polygon;
+							}
 						}
 					}
 				}
@@ -740,6 +827,8 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	@Override
 	public void update() {
 
+    	tool.update(this);
+
     	if (editPoly != null && editPoly.getVertices().size() == 0) {
     		selectedPolygons.remove(editPoly);
 			deletePoly(editPoly);
@@ -747,10 +836,8 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		}
 
 		for (UIElement element : uiElements) {
-			if (lastMousePos != null) {
-				element.mouseAt(lastMousePos);
-				element.update();
-			}
+			element.mouseAt(lastMousePos);
+			element.update();
 		}
 	}
 
@@ -805,5 +892,19 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 
 	public boolean editMode() {
     	return mode == Mode.edit;
+	}
+
+
+
+	public HashSet<Polygon> getSelectedPolygons() {
+		return selectedPolygons;
+	}
+
+	public Polygon getEditPoly() {
+		return editPoly;
+	}
+
+	public void setEditPoly(Polygon editPoly) {
+		this.editPoly = editPoly;
 	}
 }

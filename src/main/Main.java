@@ -12,13 +12,18 @@ import java.util.List;
 
 public class Main extends JPanel {
 
-    public static final int WIDTH, HEIGHT;
+    public static final int WIDTH, HEIGHT; // sizes may be off for a secondary monitor TODO: fix
+    private static final int SCREEN_WIDTH, SCREEN_HEIGHT;
     private static final int screenNum = 1;
 
     static {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        WIDTH = screenSize.width;
-        HEIGHT = screenSize.height;
+        SCREEN_WIDTH = screenSize.width;
+        SCREEN_HEIGHT = screenSize.height;
+
+        Rectangle r = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        WIDTH = r.width;
+        HEIGHT = r.height;
     }
 
     // utilities
@@ -149,15 +154,19 @@ public class Main extends JPanel {
     }
 
     public static void fullscreen() {
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setUndecorated(true);
+    }
+
+    public static void minimize() {
+        frame.setState(Frame.ICONIFIED);
     }
 
     public static void main(String[] args) {
 
         frame = new JFrame("Art Time.");
         frame.setSize(WIDTH, HEIGHT); //+17 +48
-        frame.setLocation(200, 200 + 1080 * (screenNum - 1));
+        frame.setLocation(0, SCREEN_HEIGHT * (screenNum - 1));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(new Main());
         frame.setVisible(true);

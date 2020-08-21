@@ -6,12 +6,17 @@ import util.Vector;
 public class Camera {
 
     private final Vector pos;
-    private float scale = 1F;
+    private float scale;
 
-    public static final Vector center = new Vector(Main.WIDTH / 2F, Main.HEIGHT / 2F);
+    public Vector center = new Vector(Main.WIDTH / 2F, Main.HEIGHT / 2F);
 
     public Camera(float x, float y) {
+        this(x, y, 1F);
+    }
+
+    public Camera(float x, float y, float scale) {
         this.pos = new Vector(x, y);
+        this.scale = scale;
     }
 
     public void multZoom(Vector point, float mult) {
@@ -23,6 +28,10 @@ public class Camera {
         Vector newScreen = toScreen(point);
 
         move(newScreen.subbed(screen).multed(1 / scale));
+    }
+
+    public void setCenter(Vector center) {
+        this.center = center;
     }
 
     public void move(Vector diff) {

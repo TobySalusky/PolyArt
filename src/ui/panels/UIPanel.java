@@ -1,8 +1,9 @@
-package ui;
+package ui.panels;
 
 import main.Main;
 import perspective.Camera;
 import poly.Edge;
+import ui.UIElement;
 import util.Colors;
 import util.Gizmo;
 import util.Maths;
@@ -41,6 +42,10 @@ public class UIPanel implements UIElement {
 
 		topLeft = new Vector(Math.min(topLeft.x, topLeft.x + size.x), Math.min(topLeft.y, topLeft.y + size.y));
 		size = size.multed2(Math.signum(size.x), Math.signum(size.y));
+	}
+
+	public Vector findCenter() {
+		return topLeft.added(size.multed(0.5F));
 	}
 
 	@Override

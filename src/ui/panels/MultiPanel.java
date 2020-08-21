@@ -1,9 +1,8 @@
-package ui;
+package ui.panels;
 
 import main.Main;
 import perspective.Camera;
-import poly.Edge;
-import util.Gizmo;
+import ui.UIElement;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -109,9 +108,7 @@ public class MultiPanel extends UIPanel { // TODO:
 					UIPanel next = panels.get(i + 1);
 					if (panel.topLeft.y + panel.size.y > next.topLeft.y + next.size.y - 15) {
 						panel.size.y = (next.topLeft.y + next.size.y - 15) - panel.topLeft.y;
-						//panel.topLeft.y = next.topLeft.y - 15;
 					}
-					//panel.size.y = Math.max(panel.clamp(panel.size.y), next.topLeft.y - 15 - panel.topLeft.y);
 				}
 
 				if (panel.bindSign == 1) {
@@ -130,10 +127,19 @@ public class MultiPanel extends UIPanel { // TODO:
 				} else {
 
 					UIPanel last = panels.get(i - 1);
+					float storeLast = panel.topLeft.x;
 					panel.topLeft.x = last.topLeft.x + last.size.x;
+					panel.size.x -= panel.topLeft.x - storeLast;
 
 					if (i == panels.size() - 1) {
-						panel.size.x = Main.WIDTH - panel.topLeft.x;
+						panel.size.x = (topLeft.x + size.x) - panel.topLeft.x;
+					}
+				}
+
+				if (i < panels.size() - 1) {
+					UIPanel next = panels.get(i + 1);
+					if (panel.topLeft.x + panel.size.x > next.topLeft.x + next.size.x - 15) {
+						panel.size.x = (next.topLeft.x + next.size.x - 15) - panel.topLeft.x;
 					}
 				}
 
@@ -143,20 +149,9 @@ public class MultiPanel extends UIPanel { // TODO:
 					panel.bindPos = panel.topLeft.x + panel.size.x;
 				}
 			}
-		}
 
-//		for (int i = panels.size() - 1; i >= 0; i--) {
-//			UIPanel panel = panels.get(i);
-//			if (horizontal) {
-//				if (i < panels.size() - 1) {
-//					//UIPanel next = panels.get(i + 1);
-//					//if (panel.topLeft.y + panel.size.y > next.topLeft.y) {
-//						//panel.size.y = next.topLeft.y - panel.topLeft.y - 5;
-//					//}
-//					//panel.size.y = Math.max(panel.clamp(panel.size.y), next.topLeft.y - 15 - panel.topLeft.y);
-//				}
-//			}
-//		}
+
+		}
 
 		for (UIPanel panel : panels) { // sus
 			panel.onDragChange();

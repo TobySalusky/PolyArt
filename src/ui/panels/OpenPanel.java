@@ -1,9 +1,7 @@
-package ui;
+package ui.panels;
 
 import main.Main;
 import perspective.Camera;
-import poly.Edge;
-import util.Gizmo;
 import util.Maths;
 
 import java.awt.*;

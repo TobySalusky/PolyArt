@@ -1,10 +1,7 @@
 package poly;
 
 import perspective.Camera;
-import util.Gizmo;
-import util.Maths;
-import util.Polar;
-import util.Vector;
+import util.*;
 
 import java.awt.*;
 
@@ -19,9 +16,9 @@ public class Axis {
 	}
 
 	public void render(Graphics g, Camera camera) {
-		g.setColor(Color.BLUE);
+		g.setColor(Colors.axisBlue);
 		Gizmo.drawLine(g, camera.toScreen(pivot.added(new Polar(500, radians + Maths.PI))), camera.toScreen(pivot.added(new Polar(500, radians))));
-		Gizmo.dot(g, camera.toScreen(pivot), Gizmo.midOrange);
+		Gizmo.dot(g, camera.toScreen(pivot), Colors.axisPivot);
 	}
 
 	public Vector flip(Vector vector) {

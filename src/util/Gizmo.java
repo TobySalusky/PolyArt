@@ -22,6 +22,14 @@ public class Gizmo {
         dot(g, pos, 4);
     }
 
+    public static void fillCenteredRect(Graphics g, Vector pos, Vector size) {
+        g.fillRect((int)(pos.x - size.x / 2), (int)(pos.y - size.y / 2), (int)size.x, (int)size.y);
+    }
+
+    public static void drawCenteredRect(Graphics g, Vector pos, Vector size) {
+        g.drawRect((int)(pos.x - size.x / 2), (int)(pos.y - size.y / 2), (int)size.x, (int)size.y);
+    }
+
     public static void drawSelectRect(Graphics g, Camera camera, Vector from, Vector to) {
 
         drawSelectRect(g, camera.toScreen(from), camera.toScreen(to));

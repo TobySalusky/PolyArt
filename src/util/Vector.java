@@ -5,6 +5,8 @@ public class Vector {
     public float x;
     public float y;
 
+    public final static Vector one = new Vector(1, 1), zero = new Vector(0, 0), up = new Vector(1, 0), right = new Vector(0, 1);
+
     public Vector() { }
 
     public Vector(float x, float y) {
@@ -36,6 +38,14 @@ public class Vector {
         y = 0F;
     }
 
+    public static Vector maxEach(Vector a, Vector b) {
+        return new Vector(Math.max(a.x, b.x), Math.max(a.y, b.y));
+    }
+
+    public static Vector minEach(Vector a, Vector b) {
+        return new Vector(Math.min(a.x, b.x), Math.min(a.y, b.y));
+    }
+
     public final void setTo(Vector vec) {
         setTo(vec.x, vec.y);
     }
@@ -57,6 +67,9 @@ public class Vector {
         return new Vector(x - vec.x, y - vec.y);
     }
 
+    public final Vector subbed(float x, float y) {
+        return new Vector(this.x - x, this.y - y);
+    }
     public final Vector scaled(float scalar) {
 
         float angle = angle();
