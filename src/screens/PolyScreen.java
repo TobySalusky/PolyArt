@@ -1,5 +1,6 @@
 package screens;
 
+import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
 import jdk.nashorn.internal.ir.debug.JSONWriter;
 import main.Main;
@@ -20,15 +21,18 @@ import util.*;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.*;
+import java.util.stream.Stream;
 
 public class PolyScreen implements Screen { // TODO: fix locked scaling - puts off screen (div 0?)
 
-	private final List<PolyLayer> layers = new ArrayList<>();
+	private List<PolyLayer> layers = new ArrayList<>();
 	private PolyLayer layer;
 
 	private final Camera camera = new Camera(0, 0);
@@ -697,6 +701,14 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				break;
 
 			case (KeyEvent.VK_S):
+				if (e.isShiftDown()) {
+					read();
+					break;
+				}
+				if (e.isControlDown()) {
+					save();
+					break;
+				}
 				scaleStart();
 				break;
 
@@ -723,6 +735,19 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				break;
 		}
 
+	}
+
+	private void save() {
+		FileUtil.writeTextFile("C:/tmp/data.txt", JsonWriter.objectToJson(layers));
+	}
+
+	private void read() {
+    	String path = "C:/tmp/data.txt";
+		layers = (List<PolyLayer>) JsonReader.jsonToJava(FileUtil.singleLineFileContents(path));
+		layer = layers.get(0);
+		selectedPolygons.clear();
+		selectedVertices.clear();
+		editPoly = null;
 	}
 
 	private void startTransform() {
