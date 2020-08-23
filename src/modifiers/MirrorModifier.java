@@ -14,6 +14,10 @@ public class MirrorModifier implements Modifier { // dunno if asList is safe... 
 
 	private final List<Axis> axes;
 
+	public MirrorModifier() {
+		axes = new ArrayList<>();
+	}
+
 	public MirrorModifier(Axis... args) {
 		axes = Arrays.asList(args);
 	}

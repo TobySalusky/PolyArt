@@ -12,6 +12,14 @@ public class Edge {
         this.end = end;
     }
 
+    public boolean sameEdge(Edge edge) {
+        return start == edge.getStart() && end == edge.getEnd();
+    }
+
+    public Axis perpendicular() {
+        return new Axis(start.added(end).multed(0.5F), end.subbed(start).angle() + Maths.HalfPI);
+    }
+
     public float distTo(Vector point) {
 
         Vector low, high;

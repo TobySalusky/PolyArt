@@ -2,7 +2,6 @@ package screens;
 
 import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
-import jdk.nashorn.internal.ir.debug.JSONWriter;
 import main.Main;
 import modifiers.MirrorModifier;
 import modifiers.SubdivisionModifier;
@@ -17,18 +16,17 @@ import ui.panels.MultiPanel;
 import ui.panels.OpenPanel;
 import ui.panels.Panels;
 import ui.panels.UIPanel;
+import ui.premade.EditTypeButton;
+import ui.premade.ModeButton;
+import ui.premade.ToolButton;
 import util.*;
+import util.Vector;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 import java.awt.*;
-import java.util.stream.Stream;
+import java.util.List;
 
 public class PolyScreen implements Screen { // TODO: fix locked scaling - puts off screen (div 0?)
 
@@ -52,12 +50,15 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 
     // non main
 	private final List<Vector> selectedVertices = new ArrayList<>();
+	private final List<Edge> selectedEdges = new ArrayList<>();
 	private Transform currentTransform;
 	private boolean transforming = false;
 	private TransformType transformType;
 	private Vector transformStart; // world position
 	private Vector transformPivot; // world position
-	private AxisType lockAxisType;
+	private Axis lockAxis;
+
+	private static final float selectionRange = 10F;
 
 	private boolean numListen = false;
 	private String typedNumString = "";
@@ -66,6 +67,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	// tool specific
 	private Vector selectStart, selectEnd;
 	private List<Vector> preSelectSelectedVertices;
+	private List<Edge> preSelectSelectedEdges;
 	private List<Polygon> preSelectSelectedPolygons;
 
 	private Color selectedColor = Color.WHITE;
@@ -102,6 +104,10 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 			uiElements.add(new ModeButton(mode, this,100 + 60 * mode.ordinal(), 50));
 		}
 
+		for (EditType editType : EditType.values()) {
+			uiElements.add(new EditTypeButton(editType, this,100 + 60 * editType.ordinal(), 100));
+		}
+
         for (Tool tool : Tool.values()) {
 			uiElements.add(new ToolButton(tool, this,50, 150 + 60 * tool.ordinal()));
 		}
@@ -111,7 +117,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	    object, edit
     }
 
-    private enum EditType {
+	public enum EditType {
     	verts, edges
 	}
 
@@ -133,6 +139,8 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 			protected void forceMode(PolyScreen screen) {
 				if (screen.objectMode()) {
 					screen.mode = Mode.edit;
+				} else {
+					screen.editType = EditType.verts;
 				}
 			}
 		};
@@ -155,13 +163,12 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 			public Transform genTransform(PolyScreen screen, Vector newPos) {
 				Vector diff = newPos.subbed(screen.transformStart);
 
-				if (screen.lockAxisType == AxisType.x) {
-					diff.x = 0;
-					if (screen.hasTypedNum()) diff.y = screen.typedNum;
-				} else if (screen.lockAxisType == AxisType.y) {
-					if (screen.hasTypedNum()) diff.x = screen.typedNum;
-					diff.y = 0;
+				if (screen.lockAxis != null) {
+					float dot = screen.lockAxis.normVec().dot(diff.normed());
+					diff = screen.lockAxis.normVec().multed(dot * diff.mag());
 				}
+
+				if (screen.hasTypedNum()) diff = screen.lockAxis.normVec().multed(screen.typedNum);
 
 				return new MoveTransform(diff);
 			}
@@ -189,27 +196,29 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 
 		scale {
 			@Override
-			public Transform genTransform(PolyScreen screen, Vector newPos) {
-				float scalarX, scalarY;
-				if (screen.lockAxisType == AxisType.x) {
-					scalarX = 1;
-					scalarY = newPos.subbed(screen.transformPivot).multed2(0, 1).mag() / screen.transformStart.subbed(screen.transformPivot).multed2(0, 1).mag();
-					if (screen.hasTypedNum()) scalarY = screen.typedNum;
-				} else if (screen.lockAxisType == AxisType.y) {
-					scalarX = newPos.subbed(screen.transformPivot).multed2(1, 0).mag() / screen.transformStart.subbed(screen.transformPivot).multed2(1, 0).mag();
-					if (screen.hasTypedNum()) scalarX = screen.typedNum;
-					scalarY = 1;
-				} else {
-					scalarX = newPos.subbed(screen.transformPivot).mag() / screen.transformStart.subbed(screen.transformPivot).mag();
-					if (screen.hasTypedNum()) scalarX = screen.typedNum;
-					scalarY = scalarX;
+			public Transform genTransform(PolyScreen screen, Vector newPos) { // TODO: make work with axes other than up and right
+				Vector scalar;
+
+				Vector norm = (screen.lockAxis != null) ? screen.lockAxis.normVec() : Vector.one;
+
+				float scale = newPos.subbed(screen.transformPivot).multed2(norm).mag() /
+						screen.transformStart.subbed(screen.transformPivot).multed2(norm).mag();
+
+				if (screen.hasTypedNum()) {
+					scale = screen.typedNum;
 				}
 
-				if (scalarX == 0 || scalarY == 0) {
-					return new ZeroDivScaleTransform(scalarX, scalarY, screen.transformPivot);
+				scalar = Vector.one.multed(scale);
+				if (screen.lockAxis != null) {
+					scalar.mult2(norm);
+					scalar.add(norm.flippedXY());
 				}
 
-				return new ScaleTransform(scalarX, scalarY, screen.transformPivot);
+				if (scalar.x == 0 || scalar.y == 0) {
+					return new ZeroDivScaleTransform(scalar.x, scalar.y, screen.transformPivot);
+				}
+
+				return new ScaleTransform(scalar.x, scalar.y, screen.transformPivot);
 			}
 
 			@Override
@@ -230,11 +239,11 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		}
 
 		public void flattenGizmoLine(Vector from, Vector to, PolyScreen screen) {
-			if (screen.lockAxisType == AxisType.x) {
-				to.x = from.x;
-			} else if (screen.lockAxisType == AxisType.y) {
-				to.y = from.y;
-			}
+    		if (screen.lockAxis == null) return;
+			Vector diff = to.subbed(from);
+			float dot = screen.lockAxis.normVec().dot(diff.normed());
+			diff = screen.lockAxis.normVec().multed(dot * diff.mag());
+			to.setTo(from.added(diff));
 		}
 
 		protected void gizmoLine(Graphics g, Vector from, Vector to) {
@@ -259,6 +268,10 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	public List<Vector> copyVectorList(List<Vector> verts) {
 
 		return new ArrayList<>(verts);
+	}
+
+	public List<Edge> copyEdgeList(List<Edge> edges) {
+    	return new ArrayList<>(edges);
 	}
 
 	public List<Polygon> copySelectedPolygons() {
@@ -291,19 +304,12 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 			return;
 		}
 
-		if (objectMode() || using(Tool.select)) {
+		if (objectMode() || using(Tool.select)) { // combine with thing below pls
 
-			if (editMode()) {
-				if (!e.isShiftDown()) {
-					selectedVertices.clear();
-				}
-				preSelectSelectedVertices = copyVectorList(selectedVertices);
-			} else {
-				if (!e.isShiftDown()) {
-					selectedPolygons.clear();
-				}
-				preSelectSelectedPolygons = copySelectedPolygons();
+			if (!e.isShiftDown()) {
+				selectedPolygons.clear();
 			}
+			preSelectSelectedPolygons = copySelectedPolygons();
 
 			selectStart = worldPos;
 			selectEnd = worldPos;
@@ -345,7 +351,37 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		}
 
 		// EDIT MODE ==============================================================
-		if (using(Tool.create)) { // TODO: to switch
+		if (using(Tool.select)) { // TODO -> switch
+			if (editType == EditType.verts) {
+				if (!e.isShiftDown()) {
+					selectedVertices.clear();
+				}
+				preSelectSelectedVertices = copyVectorList(selectedVertices);
+			} else { // EDGES
+				if (!e.isShiftDown()) {
+					selectedEdges.clear();
+				}
+				preSelectSelectedEdges = copyEdgeList(selectedEdges);
+			}
+
+			assert editPoly != null;
+			if (editType == EditType.verts) {
+				//TODO: vert selection
+			} else { // EDGES
+				float min = Float.MAX_VALUE;
+				Edge minEdge = null;
+				for (Edge edge : editPoly.getStoredEdges()) {
+					float dist = edge.distTo(worldPos) * camera.getScale(); // keeps screen distance consistent
+					if (dist < min) {
+						min = dist;
+						minEdge = edge;
+					}
+				}
+				if (min <= selectionRange) {
+					selectedEdges.add(minEdge);
+				}
+			}
+		} else if (using(Tool.create)) {
 			if (editPoly == null) {
 				editPoly = new Polygon(selectedColor);
 				layer.getPolygons().add(editPoly);
@@ -359,9 +395,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				selectedVertices.clear();
 			}
 			selectedVertices.add(worldPos);
-		}
-
-		if (using(Tool.easyAdd)) {
+		} else if (using(Tool.easyAdd)) {
 			if (editMode()) {
 
 				if (editPoly == null) {
@@ -472,6 +506,11 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				break;
 			case (MouseEvent.BUTTON3):
 				rightClickDown = true;
+
+				if (transforming) {
+					cancelTransform();
+					return;
+				}
 				break;
 		}
     }
@@ -506,7 +545,13 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		} else {
     		// TODO:
 			if (editType == EditType.edges) {
-
+				HashSet<Vector> verts = new HashSet<>();
+				selectedEdges.forEach(edge -> {
+					verts.add(edge.getStart());
+					verts.add(edge.getEnd());
+				});
+				selectedVertices.clear();
+				selectedVertices.addAll(verts);
 			}
 		}
 	}
@@ -535,18 +580,18 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 						Polygon poly = layer.getPolygons().get(i);
 						if (sel == poly) {
 							layer.getPolygons().remove(i);
-							if (poly == editPoly) {
-								editPoly = null;
-							}
 							break loop;
 						}
 					}
 				}
-
 			}
+
+			selectedPolygons.clear();
+			editPoly = null;
 		} else { // edit mode
 
-    		if (editType == EditType.verts && editPoly != null) {
+    		if (editPoly != null) {
+    			findSelectedVertices();
 				editPoly.removeAll(selectedVertices);
 			}
 
@@ -586,7 +631,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
     	transformStart = null;
     	transformPivot = null;
 
-    	lockAxisType = null;
+    	lockAxis = null;
 
     	numListen = false;
 	}
@@ -641,11 +686,15 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
     	switch (e.getKeyCode()) {
 
 			case (KeyEvent.VK_TAB):
-				if (mode == Mode.object) {
-					mode = Mode.edit;
+				if (!e.isShiftDown()) {
+					if (mode == Mode.object) {
+						mode = Mode.edit;
+					} else {
+						tool = Tool.select;
+						mode = Mode.object;
+					}
 				} else {
-					tool = Tool.select;
-					mode = Mode.object;
+					editType = EditType.values()[(editType.ordinal() + 1) % EditType.values().length];
 				}
 				break;
 
@@ -656,33 +705,80 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				}
 				break;
 
-			case (KeyEvent.VK_B):
-				tool = Tool.easyAdd;
+			case (KeyEvent.VK_I):
+				if (editType == EditType.edges) {
+					if (editPoly != null) {
+						Edge[] extruded = editPoly.extrude(selectedEdges);
+						selectedEdges.clear();
+						selectedEdges.addAll(Arrays.asList(extruded));
+						scaleStart();
+					}
+				}
+				break;
+
+			case (KeyEvent.VK_E):
+				if (objectMode() || editType == EditType.verts) {
+					tool = Tool.easyAdd;
+				}
+
+				if (editType == EditType.edges) {
+					if (editPoly != null) {
+						Edge[] extruded = editPoly.extrude(selectedEdges);
+						selectedEdges.clear();
+						selectedEdges.addAll(Arrays.asList(extruded));
+						moveStart();
+						lockAxis = selectedEdges.get(0).perpendicular();
+					}
+				}
+				break;
+
+			case (KeyEvent.VK_D):
+
+				if (e.isShiftDown()) {
+					if (objectMode()) {
+						List<Polygon> toCopy = copySelectedPolygons();
+						selectedPolygons.clear();
+
+						for (Polygon polygon : toCopy) {
+							Polygon clone = polygon.unlinkedFullClone();
+							layer.getPolygons().add(clone);
+							selectedPolygons.add(clone);
+
+							if (polygon == editPoly) {
+								editPoly = clone;
+							}
+							moveStart();
+						}
+
+					}
+				}
+
 				break;
 
 			case (KeyEvent.VK_M):
+				if (editPoly == null) break;
 				editPoly.addModifier(new MirrorModifier(new Axis(Vector.zero, Maths.HalfPI)));
 				break;
 			case (KeyEvent.VK_N):
+				if (editPoly == null) break;
 				editPoly.addModifier(new SubdivisionModifier(3));
 				break;
 
 			case (KeyEvent.VK_Z):
 			case (KeyEvent.VK_Y):
 				if (transforming) {
-					lockAxisType = AxisType.x;
+					lockAxis = Axis.up;
 					updateTransform(lastMousePos);
 				}
 				break;
 
-			case (KeyEvent.VK_X): // TODO: shall X delete too?
+			case (KeyEvent.VK_X): // TODO: perhaps add confirmation
 
 				if (transforming) {
-					lockAxisType = AxisType.y;
+					lockAxis = Axis.right;
 					updateTransform(lastMousePos);
+					break;
 				}
-				break;
-
 			case (KeyEvent.VK_DELETE):
 				deleteAction();
 				break;
@@ -802,17 +898,25 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		if (selectStart != null) {
 			selectEnd = camera.toWorld(lastMousePos);
 			if (editMode()) {
+				if (editPoly == null) return;
 
-				if (editPoly == null) {
-					return;
-				}
+				if (editType == EditType.verts) {
+					selectedVertices.clear();
+					selectedVertices.addAll(preSelectSelectedVertices);
 
-				selectedVertices.clear();
-				selectedVertices.addAll(preSelectSelectedVertices);
+					for (Vector vert : editPoly.getVertices()) {
+						if (vert.between(selectStart, selectEnd)) {
+							selectedVertices.add(vert);
+						}
+					}
+				} else { // Edge mode
+					selectedEdges.clear();
+					selectedEdges.addAll(preSelectSelectedEdges);
 
-				for (Vector vert : editPoly.getVertices()) {
-					if (vert.between(selectStart, selectEnd)) {
-						selectedVertices.add(vert);
+					for (Edge edge : editPoly.getStoredEdges()) {
+						if (edge.getStart().between(selectStart, selectEnd) && edge.getEnd().between(selectStart, selectEnd)) {
+							selectedEdges.add(edge);
+						}
 					}
 				}
 			} else { // object mode
@@ -902,9 +1006,25 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	public void renderLayers(Graphics g) {
 	    for (PolyLayer layer : layers) {
 	        for (Polygon poly : layer.getPolygons()) {
-                poly.render(g, camera, selectedPolygons.contains(poly), editMode() && editPoly == poly);
+                poly.render(g, camera);
             }
         }
+
+	    if (objectMode()) {
+			for (Polygon polygon : selectedPolygons) {
+				polygon.renderEdges(g, camera, e -> Color.ORANGE);
+			}
+		} else { // EDIT MODE
+	    	if (editPoly == null) return;
+
+	    	if (editType == EditType.verts) {
+				editPoly.renderEdges(g, camera, e -> Color.ORANGE);
+				editPoly.renderVerts(g, camera, p -> selectedVertices.contains(p) ? Gizmo.midOrange : Gizmo.nearBlack);
+			} else {
+				editPoly.renderEdges(g, camera, e -> selectedEdges.contains(e) ? Gizmo.midOrange : Gizmo.nearBlack);
+			}
+	    	editPoly.renderModifierGizmos(g, camera);
+		}
     }
 
     public boolean vertSelected(Vector vert) {
@@ -931,5 +1051,13 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 
 	public void setEditPoly(Polygon editPoly) {
 		this.editPoly = editPoly;
+	}
+
+	public void setEditType(EditType editType) {
+		this.editType = editType;
+	}
+
+	public EditType getEditType() {
+		return editType;
 	}
 }

@@ -70,6 +70,13 @@ public class Vector {
     public final Vector subbed(float x, float y) {
         return new Vector(this.x - x, this.y - y);
     }
+
+    public final Vector normed() {
+        Vector vec = copy();
+        vec.setMag(1);
+        return vec;
+    }
+
     public final Vector scaled(float scalar) {
 
         float angle = angle();
@@ -91,12 +98,25 @@ public class Vector {
         y *= scalar;
     }
 
+    public final Vector flippedXY() {
+        return new Vector(y, x);
+    }
+
+    public final void mult2(Vector vec) {
+        x *= vec.x;
+        y *= vec.y;
+    }
+
     public final Vector inverse() {
         return multed(-1);
     }
 
     public final Vector multed(float scalar) {
         return new Vector(x * scalar, y * scalar);
+    }
+
+    public final Vector multed2(Vector vec) {
+        return new Vector(x * vec.x, y * vec.y);
     }
 
     public final Vector multed2(float scalarX, float scalarY) {
@@ -150,6 +170,10 @@ public class Vector {
     }
 
     // TODO: dot and cross products
+
+    public final float dot(Vector vec) {
+        return x * vec.x + y * vec.y;
+    }
 
     public final boolean between(Vector from, Vector to) { // BOX COLLISION
 

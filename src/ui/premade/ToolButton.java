@@ -1,6 +1,7 @@
-package ui;
+package ui.premade;
 
 import screens.PolyScreen;
+import ui.SelectFuncButton;
 
 public class ToolButton extends SelectFuncButton {
 

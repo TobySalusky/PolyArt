@@ -10,9 +10,15 @@ public class Axis {
 	private Vector pivot;
 	private float radians;
 
+	public static final Axis up = new Axis(Vector.zero, Maths.HalfPI), right = new Axis(Vector.zero, 0);
+
 	public Axis(Vector pivot, float radians) {
 		this.pivot = pivot;
 		this.radians = radians;
+	}
+
+	public Vector normVec() {
+		return new Polar(1, radians);
 	}
 
 	public void render(Graphics g, Camera camera) {

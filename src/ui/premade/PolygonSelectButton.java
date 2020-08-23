@@ -83,7 +83,7 @@ public class PolygonSelectButton extends SizedButton {
 		float scale = Math.min(pSize.x / diff.x, pSize.y / diff.y);
 		Camera fitView = new Camera(mid.x, mid.y, scale);
 		fitView.setCenter(pos);
-		polygon.cloneGeom().render(g, fitView, false, false); // poorly optimised - does this as to not display modifiers
+		polygon.cloneGeom().render(g, fitView); // poorly optimised - does this as to not display modifiers
 	}
 
 	public Vector getSize() {
