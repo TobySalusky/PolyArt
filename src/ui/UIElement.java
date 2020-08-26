@@ -35,4 +35,15 @@ public interface UIElement {
 		return false;
 	}
 
+	default void resize(Vector pos, Vector size) {
+
+	}
+
+	default float getHeight() {
+		return -999F;
+	}
+
+	default boolean shouldRemove() {
+		return false;
+	}
 }

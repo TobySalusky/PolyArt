@@ -36,4 +36,19 @@ public abstract class SizedButton implements UIElement {
 			hover(pos);
 		}
 	}
+
+	public Vector findTopLeft() {
+		return pos.subbed(size.multed(0.5F));
+	}
+
+	@Override
+	public float getHeight() {
+		return size.y;
+	}
+
+	@Override
+	public void resize(Vector pos, Vector size) {
+		this.pos = pos;
+		this.size = size;
+	}
 }

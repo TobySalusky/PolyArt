@@ -31,8 +31,7 @@ public class ColorPickerRGB extends SizedButton {
     }
 
     public void resize(Vector pos, Vector size) {
-        this.pos = pos;
-        this.size = size;
+        super.resize(pos, size);
 
         createWheel();
     }

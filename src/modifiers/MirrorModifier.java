@@ -3,6 +3,8 @@ package modifiers;
 import perspective.Camera;
 import poly.Axis;
 import poly.Polygon;
+import ui.panels.ModifierPanel;
+import ui.premade.ModifierTab;
 import util.Vector;
 
 import java.awt.*;
@@ -10,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MirrorModifier implements Modifier { // dunno if asList is safe... (shallow/deep copy?)
+public class MirrorModifier extends Modifier { // dunno if asList is safe... (shallow/deep copy?)
 
 	private final List<Axis> axes;
 
@@ -44,10 +46,6 @@ public class MirrorModifier implements Modifier { // dunno if asList is safe... 
 
 		List<Polygon> toMirror = new ArrayList<>(Arrays.asList(polygons));
 
-		for (int i = 0; i < toMirror.size(); i++) {
-			toMirror.set(i, toMirror.get(i).cloneGeom());
-		}
-
 		for (Axis axis : axes) {
 
 			Polygon[] newPoly = new Polygon[toMirror.size()];
@@ -59,5 +57,21 @@ public class MirrorModifier implements Modifier { // dunno if asList is safe... 
 		}
 
 		return toMirror.toArray(new Polygon[0]);
+	}
+
+	@Override
+	public ModifierTab createTab(ModifierPanel panel) {
+		return new Panel(panel);
+	}
+
+	private static class Panel extends ModifierTab {
+		public Panel(ModifierPanel panel) {
+			super(panel);
+		}
+
+		@Override
+		protected String getName() {
+			return "Mirror";
+		}
 	}
 }

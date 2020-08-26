@@ -62,11 +62,6 @@ public class PolygonSelectButton extends SizedButton {
 		return false;
 	}
 
-	public void resize(Vector pos, Vector size) {
-		this.pos = pos;
-		this.size = size;
-	}
-
 	@Override
 	public void render(Graphics g, Camera camera) {
 		Color back = (findScreen().getEditPoly() == polygon) ? Colors.editLayer : (findScreen().getSelectedPolygons().contains(polygon)) ? Colors.selectedLayer : Color.DARK_GRAY;

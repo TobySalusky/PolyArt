@@ -2,6 +2,7 @@ package main;
 
 import screens.PolyScreen;
 import screens.Screen;
+import ui.TextBox;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +36,8 @@ public class Main extends JPanel {
 
     private static final List<Screen> screenList = new ArrayList<>();
     public static Screen screen;
+
+    public static TextBox typingIn;
 
     public Main() {
 
@@ -70,14 +73,14 @@ public class Main extends JPanel {
         }
     }
 
-    private class MouseWheel implements MouseWheelListener {
+    private static class MouseWheel implements MouseWheelListener {
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
             screen.mouseScrollEvent(e);
         }
     }
 
-    private class MouseMotion implements MouseMotionListener {
+    private static class MouseMotion implements MouseMotionListener {
 
         @Override
         public void mouseDragged(MouseEvent e) {
@@ -90,7 +93,7 @@ public class Main extends JPanel {
         }
     }
 
-    private class Mouse implements MouseListener {
+    private static class Mouse implements MouseListener {
 
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -118,7 +121,7 @@ public class Main extends JPanel {
         }
     }
 
-    private class Keyboard implements KeyListener {
+    private static class Keyboard implements KeyListener {
 
         @Override
         public void keyTyped(KeyEvent e) {
@@ -127,6 +130,12 @@ public class Main extends JPanel {
 
         @Override
         public void keyPressed(KeyEvent e) {
+
+            if (typingIn != null) {
+                typingIn.keyPressed(e);
+                return;
+            }
+
             int keyCode = e.getKeyCode();
 
             char keyChar = e.getKeyChar();

@@ -12,10 +12,7 @@ import poly.PolyLayer;
 import poly.Polygon;
 import transformation.*;
 import ui.*;
-import ui.panels.MultiPanel;
-import ui.panels.OpenPanel;
-import ui.panels.Panels;
-import ui.panels.UIPanel;
+import ui.panels.*;
 import ui.premade.EditTypeButton;
 import ui.premade.ModeButton;
 import ui.premade.ToolButton;
@@ -92,7 +89,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		MultiPanel right = new MultiPanel(UIPanel.HORIZONTAL, Main.WIDTH, -100);
 
 		right.addPanel(new Panels.ColorPanel(UIPanel.VERTICAL, 0, 200, this));
-		right.addPanel(new UIPanel(UIPanel.VERTICAL, 200, 300));
+		right.addPanel(new ModifierPanel(UIPanel.VERTICAL, 200, 300, this));
 		right.addPanel(new Panels.PolySelectPanel(UIPanel.VERTICAL, 500, 100, this));
 		multi.addPanel(right);
 
@@ -464,6 +461,14 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
     	return layers;
 	}
 
+	public PolyLayer getLayer() {
+		return layer;
+	}
+
+	public Camera getCamera() {
+		return camera;
+	}
+
 	public int polygonCount() {
 
     	int count = 0;
@@ -695,15 +700,22 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 					}
 				} else {
 					editType = EditType.values()[(editType.ordinal() + 1) % EditType.values().length];
+					tool = Tool.select;
 				}
 				break;
 
 			case (KeyEvent.VK_A):
-				if (editMode() && editPoly != null) {
-					selectedVertices.clear();
-					selectedVertices.addAll(copyVectorList(editPoly.getVertices()));
+				if (e.isShiftDown()) {
+					uiElements.add(new ActionMenu.MeshMenu(lastMousePos));
+				} else {
+					if (editMode() && editPoly != null) {
+						selectedVertices.clear();
+						selectedVertices.addAll(copyVectorList(editPoly.getVertices()));
+					}
 				}
 				break;
+
+
 
 			case (KeyEvent.VK_I):
 				if (editType == EditType.edges) {
@@ -797,7 +809,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				break;
 
 			case (KeyEvent.VK_S):
-				if (e.isShiftDown()) {
+				if (e.isShiftDown() && e.isControlDown()) {
 					read();
 					break;
 				}
@@ -964,7 +976,13 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 			editPoly = null;
 		}
 
-		for (UIElement element : uiElements) {
+		for (int i = 0; i < uiElements.size(); i++) {
+			UIElement element = uiElements.get(i);
+			if (element.shouldRemove()) {
+				uiElements.remove(i);
+				i--;
+				continue;
+			}
 			element.mouseAt(lastMousePos);
 			element.update();
 		}
@@ -1059,5 +1077,9 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 
 	public EditType getEditType() {
 		return editType;
+	}
+
+	public Color getSelectedColor() {
+		return selectedColor;
 	}
 }

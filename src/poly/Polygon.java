@@ -223,10 +223,12 @@ public class Polygon {
         g.setColor(color);
 
         if (modifiers.size() > 0) { // MODIFIER OUTPUT
-            Polygon[] modified = new Polygon[]{this};
+            Polygon[] modified = new Polygon[]{cloneGeom()}; // clones geometry as to not get stuck in loop
 
             for (Modifier modifier : modifiers) {
-                modified = modifier.create(modified);
+                if (modifier.shouldChange(this)) {
+                    modified = modifier.create(modified);
+                }
             }
 
             for (Polygon polygon : modified) {

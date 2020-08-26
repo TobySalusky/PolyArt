@@ -41,7 +41,7 @@ public class Panels {
 			float x = findCenter().x;
 			for (int i = 0; i < elements.size(); i++) {
 				Vector buttonPos = new Vector(x, topLeft.y + height * (i + 0.5F));
-				((PolygonSelectButton)elements.get(i)).resize(buttonPos, new Vector(width, height));
+				elements.get(i).resize(buttonPos, new Vector(width, height));
 			}
 		}
 
