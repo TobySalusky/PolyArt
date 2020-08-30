@@ -2,6 +2,7 @@ package modifiers;
 
 import main.Main;
 import perspective.Camera;
+import poly.Axis;
 import poly.Polygon;
 import screens.PolyScreen;
 import ui.panels.ModifierPanel;
@@ -27,6 +28,10 @@ public abstract class Modifier {
 			return true;
 		}
 		return false;
+	}
+
+	public Axis[] snappingAxes(Polygon polygon) {
+		return null;
 	}
 
 	public abstract Polygon[] create(Polygon[] polygon);

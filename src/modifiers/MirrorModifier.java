@@ -41,6 +41,10 @@ public class MirrorModifier extends Modifier { // dunno if asList is safe... (sh
 		return mirrored;
 	}
 
+	public Axis[] snappingAxes(Polygon polygon) {
+		return axes.toArray(new Axis[0]);
+	}
+
 	@Override
 	public Polygon[] create(Polygon[] polygons) {
 

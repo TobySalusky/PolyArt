@@ -27,6 +27,18 @@ public class Axis {
 		Gizmo.dot(g, camera.toScreen(pivot), Colors.axisPivot);
 	}
 
+	public Vector offsetFrom(Vector vector) {
+		Vector off = vector.copy();
+
+		off.rotateAround(-radians, pivot);
+
+		off.x = 0;
+		off.y = off.y - pivot.y;
+		off.rotate(radians);
+
+		return off;
+	}
+
 	public Vector flip(Vector vector) {
 		Vector flipped = vector.copy();
 

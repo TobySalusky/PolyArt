@@ -4,6 +4,7 @@ import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
 import main.Main;
 import modifiers.MirrorModifier;
+import modifiers.Modifier;
 import modifiers.SubdivisionModifier;
 import perspective.Camera;
 import poly.Axis;
@@ -53,6 +54,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	private TransformType transformType;
 	private Vector transformStart; // world position
 	private Vector transformPivot; // world position
+	private boolean findPivotByMass = true;
 	private Axis lockAxis;
 
 	private static final float selectionRange = 10F;
@@ -66,6 +68,9 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	private List<Vector> preSelectSelectedVertices;
 	private List<Edge> preSelectSelectedEdges;
 	private List<Polygon> preSelectSelectedPolygons;
+
+	private List<Axis> snappingAxes;
+	private boolean shiftHeld;
 
 	private Color selectedColor = Color.WHITE;
 
@@ -165,6 +170,16 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 					diff = screen.lockAxis.normVec().multed(dot * diff.mag());
 				}
 
+				if (screen.snappingMode()) { // snapping
+					if (screen.snappingAxes == null) {
+						screen.genSnappingAxes();
+					}
+					Vector snapOff = screen.snapOffset(new MoveTransform(diff));
+					if (snapOff != null) {
+						diff.sub(snapOff);
+					}
+				}
+
 				if (screen.hasTypedNum()) diff = screen.lockAxis.normVec().multed(screen.typedNum);
 
 				return new MoveTransform(diff);
@@ -178,6 +193,12 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				flattenGizmoLine(from, to, screen);
 
 				gizmoLine(g, from, to);
+
+				if (screen.snappingMode() && screen.snappingAxes != null) {
+					for (Axis axis : screen.snappingAxes) {
+						axis.render(g, screen.camera);
+					}
+				}
 			}
 		},
 
@@ -435,6 +456,50 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 		Gizmo.dot(g, lastMousePos, Gizmo.midOrange);
 	}
 
+	private boolean snappingMode() {
+    	return (transforming && transformType == TransformType.move && shiftHeld);
+	}
+
+	private Vector snapOffset(Transform transform) { // TODO: disallow multi-axis movement when axis-locked
+
+    	if (snappingAxes != null) {
+    		Vector minOff = null;
+    		for (Axis axis : snappingAxes) { // make parallel stream?
+				for (Vector vector : selectedVertices) {
+					Vector transformed = vector.copy();
+					transform.apply(transformed);
+					Vector off = axis.offsetFrom(transformed);
+					float mag = off.mag();
+					if (mag < 50 / camera.getScale()) {
+						if (minOff == null || mag < minOff.mag()) {
+							minOff = off;
+						}
+					}
+				}
+			}
+    		return minOff;
+		}
+
+    	return null;
+	}
+
+	private void genSnappingAxes() {
+    	snappingAxes = new ArrayList<>();
+    	for (Vector vert : editPoly.getVertices()) {
+			if (!selectedVertices.contains(vert)) { //  D:<
+				snappingAxes.add(new Axis(vert, 0));
+				snappingAxes.add(new Axis(vert, Maths.HalfPI));
+			}
+		}
+
+    	for (Modifier modifier : editPoly.getModifiers()) {
+    		Axis[] modAxes = modifier.snappingAxes(editPoly);
+    		if (modAxes != null) {
+				snappingAxes.addAll(Arrays.asList(modAxes));
+			}
+		}
+	}
+
 	private void previewEasyAdd(Graphics g) {
     	Vector worldPos = camera.toWorld(lastMousePos);
 
@@ -625,7 +690,9 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	}
 
 	private void cancelTransform() {
-    	currentTransform.remove(selectedVertices);
+    	if (currentTransform != null) {
+			currentTransform.remove(selectedVertices);
+		}
     	endTransform();
 	}
 
@@ -639,6 +706,8 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
     	lockAxis = null;
 
     	numListen = false;
+
+    	snappingAxes = null;
 	}
 
 	private void rotStart() {
@@ -663,7 +732,10 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 	}
 
 	private Vector findPivot() {
-    	return Vertices.average(selectedVertices);
+    	if (findPivotByMass) {
+			return Vertices.average(selectedVertices);
+		}
+		return Vertices.center(selectedVertices);
 	}
 
 	public void addTypedNum(String added) {
@@ -691,6 +763,8 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
     	switch (e.getKeyCode()) {
 
 			case (KeyEvent.VK_TAB):
+				cancelTransform();
+
 				if (!e.isShiftDown()) {
 					if (mode == Mode.object) {
 						mode = Mode.edit;
@@ -800,6 +874,10 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				enterAction();
 				break;
 
+			case (KeyEvent.VK_SHIFT):
+				shiftHeld = true;
+				break;
+
 			case (KeyEvent.VK_G):
 				moveStart();
 				break;
@@ -842,7 +920,15 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				}
 				break;
 		}
+	}
 
+	@Override
+	public void keyUp(KeyEvent e) {
+		switch (e.getKeyCode()) {
+			case KeyEvent.VK_SHIFT:
+				shiftHeld = false;
+				break;
+		}
 	}
 
 	private void save() {
