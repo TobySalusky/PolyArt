@@ -14,8 +14,14 @@ public abstract class Modifier {
 
 	private boolean visible = true, showEdit = true;
 
-	public void apply(Polygon polygon) {
-		System.out.println("DEBUG: " + getClass().toString() + "'s application functionality is yet to be implemented...");
+	public boolean apply(Polygon polygon) {
+		Polygon[] output = create(new Polygon[]{polygon});
+
+		if (output.length == 1) {
+			polygon.copyGeom(output[0]);
+			return true;
+		}
+		return false;
 	}
 
 	public void render(Graphics g, Camera camera, Polygon polygon) {} // render extras

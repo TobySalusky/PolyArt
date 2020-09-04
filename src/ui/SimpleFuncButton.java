@@ -2,6 +2,7 @@ package ui;
 
 import lambda.Func;
 import perspective.Camera;
+import util.Colors;
 import util.Gizmo;
 import util.Maths;
 import util.Vector;
@@ -33,5 +34,7 @@ public class SimpleFuncButton extends SizedButton {
 	public void render(Graphics g, Camera camera) {
 		g.setColor(findColor());
 		Gizmo.fillCenteredRect(g, pos, size);
+		g.setColor(Colors.darkGrey);
+		Gizmo.drawCenteredRect(g, pos, size);
 	}
 }

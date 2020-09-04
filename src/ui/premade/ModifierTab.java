@@ -14,13 +14,14 @@ import java.awt.Graphics;
 public class ModifierTab extends UIContainer {
 
 	private boolean open;
-	protected static final int openStart = 3;
+	protected static final int openStart = 4;
 
 	public ModifierTab(ModifierPanel panel) {
 		pos = Vector.zero;
 		size = Vector.one.multed(100);
 		elements.add(new FuncButton(this::toggleOpen, 0, 0, 0, 0));
 		elements.add(new TextField(getName(), 0, 0, 0, 0));
+		elements.add(new FuncButton(() -> panel.tryApply(this), 0, 0, 0, 0));
 		elements.add(new FuncButton(() -> panel.remove(this), 0, 0, 0, 0));
 	}
 
@@ -62,7 +63,8 @@ public class ModifierTab extends UIContainer {
 		super.resize(pos, size);
 		elements.get(0).resize(findTopLeft().added(20, 20), new Vector(15, 15));
 		elements.get(1).resize(pos.subbed(-20, size.y / 2 - 20), new Vector(size.x - 40, 30));
-		elements.get(2).resize(findTopLeft().added(size.x - 12, 20), new Vector(15, 15));
+		elements.get(2).resize(findTopLeft().added(size.x - 30, 20), new Vector(15, 15));
+		elements.get(3).resize(findTopLeft().added(size.x - 12, 20), new Vector(15, 15));
 
 		if (open) {
 			resizeOpen(pos, size);

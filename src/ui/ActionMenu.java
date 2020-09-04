@@ -2,8 +2,10 @@ package ui;
 
 import main.Main;
 import perspective.Camera;
+import poly.ImagePoly;
 import poly.Polygon;
 import screens.PolyScreen;
+import util.FileUtil;
 import util.Generator;
 import util.Vector;
 
@@ -65,6 +67,25 @@ public abstract class ActionMenu extends UIContainer { // this is one of those s
 			elements.add(new SimpleFuncButton(() -> {
 				PolyScreen screen = ((PolyScreen)Main.screen);
 				Polygon square = Generator.genSquare(screen.getCamera().copyPos(), 100);
+				square.setColor(screen.getSelectedColor());
+				screen.getLayer().getPolygons().add(square);
+				screen.getSelectedPolygons().clear();
+				screen.getSelectedPolygons().add(square);
+				screen.setEditPoly(square);
+			}, 0, 0, 0, 0));
+
+			elements.add(new SimpleFuncButton(() -> {
+				PolyScreen screen = ((PolyScreen)Main.screen);
+				Polygon square = new ImagePoly(FileUtil.fileToImage("C://tmp/image.jpg"), screen.getCamera().copyPos(), 100);
+				screen.getLayer().getPolygons().add(square);
+				screen.getSelectedPolygons().clear();
+				screen.getSelectedPolygons().add(square);
+				screen.setEditPoly(square);
+			}, 0, 0, 0, 0));
+
+			elements.add(new SimpleFuncButton(() -> {
+				PolyScreen screen = ((PolyScreen)Main.screen);
+				Polygon square = Generator.genEdgePoly(screen.getCamera().copyPos(), 100);
 				square.setColor(screen.getSelectedColor());
 				screen.getLayer().getPolygons().add(square);
 				screen.getSelectedPolygons().clear();

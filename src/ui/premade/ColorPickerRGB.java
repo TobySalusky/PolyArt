@@ -93,6 +93,11 @@ public class ColorPickerRGB extends SizedButton {
         }
     }
 
+    public void hueChange(Color newColor) {
+        color = newColor;
+        createWheel();
+    }
+
     public void changeColor() {
         screen.colorSelected(findColor(mousePercentX * wheel.getWidth(), mousePercentY * wheel.getHeight()));
     }

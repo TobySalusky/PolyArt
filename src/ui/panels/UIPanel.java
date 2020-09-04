@@ -56,7 +56,7 @@ public class UIPanel implements UIElement {
 	}
 
 	protected void renderSelf(Graphics g, Camera camera) {
-		g.setColor(Gizmo.darkGrey);
+		g.setColor(Colors.darkGrey);
 		g.fillRect((int) topLeft.x, (int) topLeft.y, (int) size.x, (int) size.y);
 
 		if (bindSign == 1) {

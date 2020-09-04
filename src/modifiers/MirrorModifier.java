@@ -24,6 +24,24 @@ public class MirrorModifier extends Modifier { // dunno if asList is safe... (sh
 		axes = Arrays.asList(args);
 	}
 
+	private boolean single(Polygon polygon) {
+		List<Vector> verts = polygon.getVertices();
+		if (axes.size() != 1 && verts.size() > 2) return false;
+		Axis axis = axes.get(0);
+		for (int i = 0; i < verts.size(); i++) {
+			Vector p1 = verts.get(i), p2 = verts.get((i + 1) % verts.size());
+			if (axis.onAxis(p1) && axis.onAxis(p2)) { // TODO: SNAP p1 and p2 to axis if within range pls
+				Polygon clone = polygon.cloneGeom();
+				for (int add = 1; add <= verts.size() - 2; add++) {
+					clone.insertPoint(axis.flip(verts.get((i + 1 + add) % verts.size())), i + 1);
+				}
+				polygon.copyGeom(clone);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public void render(Graphics g, Camera camera, Polygon polygon) {
 		for (Axis axis : axes) {
@@ -47,6 +65,13 @@ public class MirrorModifier extends Modifier { // dunno if asList is safe... (sh
 
 	@Override
 	public Polygon[] create(Polygon[] polygons) {
+
+		if (polygons.length == 1) { // TODO: fix (super scuffed, can only handle one...)
+			Polygon single = polygons[0].cloneGeom();
+			if (single(single)) {
+				return new Polygon[]{single};
+			}
+		}
 
 		List<Polygon> toMirror = new ArrayList<>(Arrays.asList(polygons));
 

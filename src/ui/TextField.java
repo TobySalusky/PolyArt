@@ -2,6 +2,7 @@ package ui;
 
 import lambda.Func;
 import perspective.Camera;
+import util.Colors;
 import util.Fonts;
 import util.Gizmo;
 import util.Vector;
@@ -25,7 +26,7 @@ public class TextField extends SizedButton {
 	}
 
 	protected Color findColor() {
-		return Gizmo.darkGrey;
+		return Colors.darkGrey;
 	}
 
 	public void render(Graphics g, Camera camera) {

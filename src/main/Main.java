@@ -3,6 +3,7 @@ package main;
 import screens.PolyScreen;
 import screens.Screen;
 import ui.TextBox;
+import util.Vector;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +18,8 @@ public class Main extends JPanel {
     private static final int SCREEN_WIDTH, SCREEN_HEIGHT;
     private static final int screenNum = 1;
 
+    public static final Vector SCREEN_CENTER;
+
     static {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         SCREEN_WIDTH = screenSize.width;
@@ -25,6 +28,8 @@ public class Main extends JPanel {
         Rectangle r = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         WIDTH = r.width;
         HEIGHT = r.height;
+
+        SCREEN_CENTER = new Vector(WIDTH / 2F, HEIGHT / 2F);
     }
 
     // utilities
@@ -61,6 +66,10 @@ public class Main extends JPanel {
         setFocusTraversalKeysEnabled(false);
 
         fullscreen();
+    }
+
+    public static PolyScreen debugScreen() {
+        return (PolyScreen) screen;
     }
 
     private class TimerListener implements ActionListener {
@@ -102,6 +111,14 @@ public class Main extends JPanel {
 
         @Override
         public void mousePressed(MouseEvent e) {
+
+            if (typingIn != null) {
+                if (!typingIn.on(screen.mousePos(e))) {
+                    typingIn.clickOff();
+                    return;
+                }
+            }
+
             screen.mouseDown(e);
         }
 

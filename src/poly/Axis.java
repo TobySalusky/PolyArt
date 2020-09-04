@@ -27,6 +27,10 @@ public class Axis {
 		Gizmo.dot(g, camera.toScreen(pivot), Colors.axisPivot);
 	}
 
+	public boolean onAxis(Vector vector) {
+		return offsetFrom(vector).mag() < 0.1F; // TODO: perhaps add range
+	}
+
 	public Vector offsetFrom(Vector vector) {
 		Vector off = vector.copy();
 

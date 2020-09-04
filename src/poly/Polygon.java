@@ -8,6 +8,7 @@ import modifiers.Modifier;
 import perspective.Camera;
 import screens.PolyScreen;
 import util.Gizmo;
+import util.VecRect;
 import util.Vector;
 
 import java.awt.*;
@@ -18,7 +19,7 @@ import java.util.function.Function;
 
 public class Polygon {
 
-    private final List<Vector> vertices = new ArrayList<>(3);
+    protected final List<Vector> vertices = new ArrayList<>(3);
     private Color color;
 
     private final List<Modifier> modifiers = new ArrayList<>(1);
@@ -128,6 +129,11 @@ public class Polygon {
         System.out.println("NO SUCH EDGE FOUND");
     }
 
+    public VecRect findRect() {
+        Vector[] range = findRange();
+        return new VecRect(range[0].added(range[1]).multed(0.5F), range[1].subbed(range[0]));
+    }
+
     public Vector[] findRange() { // returns top-left and bottom-right points of rectangle around polygon
         Vector min = vertices.get(0);
         Vector max = vertices.get(0);
@@ -146,6 +152,12 @@ public class Polygon {
         Polygon copy = (Polygon) JsonReader.jsonToJava(JsonWriter.objectToJson(this));
         copy.offloadEdges();
         return copy;
+    }
+
+    public void copyGeom(Polygon polygon) { // unlinked
+        vertices.clear();
+        polygon.vertices.forEach(p -> vertices.add(p.copy()));
+        fixStoredEdges();
     }
 
     public Polygon cloneGeom() { // clones polygon without modifiers
@@ -237,18 +249,23 @@ public class Polygon {
             }
             lastOutput = modified;
         } else {
-            int[] xPoints = new int[vertices.size()];
-            int[] yPoints = new int[xPoints.length];
-
-            for (int i = 0; i < vertices.size(); i++) {
-                Vector vert = vertices.get(i);
-                xPoints[i] = (int) camera.getRenderX(vert.x);
-                yPoints[i] = (int) camera.getRenderY(vert.y);
-            }
-
-            g.fillPolygon(xPoints, yPoints, xPoints.length);
+            unmodifiedRender(g, camera);
         }
     }
+
+    protected void unmodifiedRender(Graphics g, Camera camera) {
+        int[] xPoints = new int[vertices.size()];
+        int[] yPoints = new int[xPoints.length];
+
+        for (int i = 0; i < vertices.size(); i++) {
+            Vector vert = vertices.get(i);
+            xPoints[i] = (int) camera.getRenderX(vert.x);
+            yPoints[i] = (int) camera.getRenderY(vert.y);
+        }
+
+        g.fillPolygon(xPoints, yPoints, xPoints.length);
+    }
+
     public void renderModifierGizmos(Graphics g, Camera camera) {
         if (modifiers.size() > 0) {
             for (Modifier modifier : modifiers) {

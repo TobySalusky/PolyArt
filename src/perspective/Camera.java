@@ -122,4 +122,8 @@ public class Camera {
     public float getY() {
         return pos.y;
     }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
 }

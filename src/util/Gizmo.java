@@ -4,10 +4,9 @@ import main.Main;
 import perspective.Camera;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Gizmo {
-
-    public static final Color green = Color.GREEN, midOrange = new Color(240, 120, 0), darkGrey = new Color(40, 40, 40), nearBlack = new Color(15, 15, 15), select = new Color(100, 100, 150, 70);
 
     public static void dottedLine(Graphics g, Vector from, Vector to) {
         dottedLine(g, from, to, 10, 4);
@@ -30,6 +29,10 @@ public class Gizmo {
         g.drawRect((int)(pos.x - size.x / 2), (int)(pos.y - size.y / 2), (int)size.x, (int)size.y);
     }
 
+    public static void drawCenteredImage(Graphics g, BufferedImage image, Vector pos, Vector size) {
+        g.drawImage(image, (int)(pos.x - size.x / 2), (int)(pos.y - size.y / 2), (int)size.x, (int)size.y, null);
+    }
+
     public static void drawSelectRect(Graphics g, Camera camera, Vector from, Vector to) {
 
         drawSelectRect(g, camera.toScreen(from), camera.toScreen(to));
@@ -39,7 +42,7 @@ public class Gizmo {
         Vector tl = new Vector(Math.min(from.x, to.x), Math.min(from.y, to.y));
         Vector br = new Vector(Math.max(from.x, to.x), Math.max(from.y, to.y));
 
-        g.setColor(select);
+        g.setColor(Colors.select);
         g.fillRect((int)tl.x, (int)tl.y, (int)(br.x - tl.x), (int)(br.y - tl.y));
 
         g.setColor(Color.BLACK);

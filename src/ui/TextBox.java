@@ -28,15 +28,6 @@ public class TextBox extends TextField {
 		lastText = text;
 	}
 
-	@Override
-	public boolean mouseDown(MouseEvent e) {
-		boolean result = super.mouseDown(e);
-		if (!result && Main.typingIn == this) {
-			clickOff();
-		}
-		return result;
-	}
-
 	private boolean specialKeys(KeyEvent e) { // returns true if special key is pressed
 		int code = e.getKeyCode();
 
@@ -121,7 +112,7 @@ public class TextBox extends TextField {
 		text = text.substring(0, index) + text.substring(index + 1);
 	}
 
-	protected void clickOff() {
+	public void clickOff() {
 		enterAction();
 	}
 
@@ -164,7 +155,7 @@ public class TextBox extends TextField {
 
 	@Override
 	public void render(Graphics g, Camera camera) {
-		boolean typing = this == Main.typingIn;
+		boolean typing = (this == Main.typingIn);
 		if (typing) {
 			g.setColor(Color.LIGHT_GRAY);
 			int border = 1;

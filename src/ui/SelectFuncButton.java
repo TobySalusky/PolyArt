@@ -2,6 +2,7 @@ package ui;
 
 import lambda.Func;
 import lambda.FuncB;
+import util.Colors;
 import util.Gizmo;
 import util.Vector;
 
@@ -27,6 +28,6 @@ public class SelectFuncButton extends FuncButton {
 		if (sel.isTrue()) {
 			return super.findColor();
 		}
-		return Gizmo.darkGrey;
+		return Colors.darkGrey;
 	}
 }

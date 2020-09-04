@@ -2,7 +2,10 @@ package ui.panels;
 
 import main.Main;
 import perspective.Camera;
+import poly.Edge;
 import ui.UIElement;
+import util.Colors;
+import util.Gizmo;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -38,12 +41,12 @@ public class MultiPanel extends UIPanel { // TODO:
 
 	@Override
 	public void render(Graphics g, Camera camera) {
-		renderSelf(g, camera);
 
 		List<UIPanel> panels = (renderOrder == null) ? panelList() : renderOrder;
 		for (UIPanel panel : panels) {
 			panel.render(g, camera);
 		}
+		renderSelf(g, camera);
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import screens.PolyScreen;
 import ui.FuncButton;
 import ui.UIElement;
 import ui.premade.ColorPickerRGB;
+import ui.premade.HueSlider;
 import ui.premade.PolygonSelectButton;
 import util.Maths;
 import util.Vector;
@@ -106,18 +107,20 @@ public class Panels {
 
 	public static class ColorPanel extends UIPanel {
 
-		private final ColorPickerRGB color;
 
 		public ColorPanel(boolean horizontal, float bindPos, float width, PolyScreen polyScreen) {
 			super(horizontal, bindPos, width);
 
-			color = new ColorPickerRGB(polyScreen);
+			ColorPickerRGB color = new ColorPickerRGB(polyScreen);
 			elements.add(color);
+			elements.add(new HueSlider(color));
 		}
 
 		@Override
 		protected void onDragChange() {
-			color.resize(findCenter(), Vector.maxEach(size.subbed(30, 30), Vector.one));
+			UIElement picker = elements.get(0);
+			picker.resize(findCenter(), Vector.maxEach(size.subbed(30, 30), Vector.one));
+			elements.get(1).resize(findCenter().added(0, picker.getHeight() / 2 + 15), Vector.maxEach(new Vector(size.x - 20, 20), Vector.one));
 		}
 	}
 
@@ -126,6 +129,9 @@ public class Panels {
 		public ScreenPanel() {
 			super(UIPanel.HORIZONTAL, 0, Main.WIDTH);
 		}
+
+		@Override
+		protected void renderSelf(Graphics g, Camera camera) { }
 
 		public void setUpPanels() {
 			onDragChange();

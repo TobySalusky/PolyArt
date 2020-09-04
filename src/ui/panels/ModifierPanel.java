@@ -17,6 +17,19 @@ public class ModifierPanel extends UIPanel {
 		this.screen = screen;
 	}
 
+	public void tryApply(ModifierTab tab) {
+		for (int i = 0; i < elements.size(); i++) {
+			if (elements.get(i) == tab) {
+				if (polygon.getModifiers().get(i).apply(polygon)) {
+					polygon.getModifiers().remove(i);
+				} else {
+					screen.errorPopup("Modifier could not be applied");
+				}
+				break;
+			}
+		}
+	}
+
 	public void remove(ModifierTab tab) {
 		for (int i = 0; i < elements.size(); i++) {
 			if (elements.get(i) == tab) {

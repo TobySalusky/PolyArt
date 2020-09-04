@@ -6,7 +6,7 @@ public abstract class SizedButton implements UIElement {
 
 	protected Vector pos, size;
 
-	protected boolean on(Vector mousePos) {
+	public boolean on(Vector mousePos) {
 		if (mousePos.x >= pos.x - size.x / 2 && mousePos.x <= pos.x + size.x / 2) {
 			return (mousePos.y >= pos.y - size.y / 2 && mousePos.y <= pos.y + size.y / 2);
 		}
