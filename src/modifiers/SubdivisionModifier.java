@@ -4,11 +4,11 @@ import poly.Edge;
 import poly.Polygon;
 import ui.FuncButton;
 import ui.IntTextBox;
+import ui.TextField;
 import ui.panels.ModifierPanel;
 import ui.premade.ModifierTab;
 import util.Vector;
 
-import java.awt.Panel;
 import java.util.List;
 
 public class SubdivisionModifier extends Modifier {
@@ -101,6 +101,10 @@ public class SubdivisionModifier extends Modifier {
 		return new Panel(panel);
 	}
 
+	private void shiftType() {
+		type = SubType.values()[(type.ordinal() + 1) % SubType.values().length];
+	}
+
 	private class Panel extends ModifierTab {
 		public Panel(ModifierPanel panel) {
 			super(panel);
@@ -114,16 +118,24 @@ public class SubdivisionModifier extends Modifier {
 					return Math.min(10, val);
 				}
 			});
+			TextField typeName = new TextField(type.name(), 0, 0, 0, 0);
+			elements.add(typeName);
+			elements.add(new FuncButton(() -> {
+				shiftType();
+				typeName.changeTo(type.name());
+			}, 0, 0, 0, 0));
 		}
 
 		@Override
 		protected float openHeight() {
-			return 70;
+			return 100;
 		}
 
 		@Override
 		protected void resizeOpen(Vector pos, Vector size) {
 			elements.get(openStart).resize(new Vector(pos.x, findTopLeft().y + 50), new Vector(size.x - 40, 20));
+			elements.get(openStart + 1).resize(new Vector(pos.x + 20, findTopLeft().y + 70), new Vector(size.x - 60, 20));
+			elements.get(openStart + 2).resize(findTopLeft().added(40, 70), new Vector(15, 15));
 		}
 
 		@Override

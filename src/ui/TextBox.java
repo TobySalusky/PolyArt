@@ -28,6 +28,11 @@ public class TextBox extends TextField {
 		lastText = text;
 	}
 
+	public void changeTo(String str) {
+		text = str;
+		textChanged();
+	}
+
 	private boolean specialKeys(KeyEvent e) { // returns true if special key is pressed
 		int code = e.getKeyCode();
 

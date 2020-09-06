@@ -36,4 +36,8 @@ public class TextField extends SizedButton {
 		g.setColor(Color.LIGHT_GRAY);
 		g.drawString(text, (int)(pos.x - size.x / 2), (int)(pos.y + size.y / 4));
 	}
+
+	public void changeTo(String str) {
+		text = str;
+	}
 }

@@ -9,7 +9,7 @@ import java.awt.event.MouseWheelEvent;
 
 public interface Screen {
 
-    void update();
+    void update(float deltaTime);
     void render(Graphics g);
 
     default void numberDown(int num) {

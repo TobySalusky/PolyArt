@@ -15,10 +15,7 @@ import poly.Polygon;
 import transformation.*;
 import ui.*;
 import ui.panels.*;
-import ui.premade.EditTypeButton;
-import ui.premade.ErrorPopUp;
-import ui.premade.ModeButton;
-import ui.premade.ToolButton;
+import ui.premade.*;
 import util.*;
 import util.Vector;
 
@@ -80,6 +77,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 
 	// ui
 	private final List<UIElement> uiElements = new ArrayList<>();
+	private AnimationPanel animationPanel;
 
 	// settings
 	private boolean findPivotByMass = true, antialiasRender = true;
@@ -89,19 +87,18 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
         layer = new PolyLayer();
         layers.add(layer);
 
-        //uiElements.add(new UIPanel(UIPanel.HORIZONTAL, Main.WIDTH, -100));
 		Panels.ScreenPanel screen = new Panels.ScreenPanel();
 		uiElements.add(screen);
 
 		screen.addPanel(new Panels.ApplicationBarPanel());
 		MultiPanel multi = new MultiPanel(UIPanel.VERTICAL, Main.HEIGHT, -200);
 		screen.addPanel(multi);
-		//screen.addPanel(new UIPanel(UIPanel.VERTICAL, Main.HEIGHT, -100));
 
 		MultiPanel openMulti = new MultiPanel(UIPanel.HORIZONTAL, 0, Main.WIDTH - 200);
 		multi.addPanel(openMulti);
-		openMulti.addPanel(new OpenPanel(UIPanel.VERTICAL, 0, Main.HEIGHT - 200));
-		openMulti.addPanel(new UIPanel(UIPanel.VERTICAL, Main.HEIGHT, -200));
+		openMulti.addPanel(new OpenPanel(UIPanel.VERTICAL, 0, Main.HEIGHT - 150));
+		animationPanel = new AnimationPanel(UIPanel.VERTICAL, Main.HEIGHT, -150);
+		openMulti.addPanel(animationPanel);
 
 
 		MultiPanel right = new MultiPanel(UIPanel.HORIZONTAL, Main.WIDTH, -100);
@@ -884,7 +881,16 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				deleteAction();
 				break;
 
+			case KeyEvent.VK_K:
+				if (editPoly != null)
+					animationPanel.animation.key(editPoly);
+				break;
+
 			case (KeyEvent.VK_SPACE):
+				if (animationPanel.inFocus()) {
+					animationPanel.animation.togglePlaying();
+					break;
+				}
 			case (KeyEvent.VK_ENTER):
 				enterAction();
 				break;
@@ -918,16 +924,6 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 					renderImage(new VecRect(selectStart.added(selectEnd).multed(0.5F), selectEnd.subbed(selectStart)));
 				}
 				break;
-
-			/*case (KeyEvent.VK_SPACE):
-				if (editMode()) {
-					if (editType == EditType.verts) {
-						editType = EditType.edges;
-					} else {
-						editType = EditType.verts;
-					}
-				}
-				break;*/
 
 			case (KeyEvent.VK_PERIOD):
 				if (numListen) {
@@ -1110,7 +1106,7 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
     }
 
 	@Override
-	public void update() {
+	public void update(float deltaTime) {
 
     	tool.update(this);
 

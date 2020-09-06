@@ -95,9 +95,17 @@ public class UIPanel implements UIElement {
 
 		for (UIElement element : elements) {
 			element.mouseDown(e);
-
 		}
-		return mousePos.between(topLeft, topLeft.added(size));
+
+		if (mousePos.between(topLeft, topLeft.added(size))) {
+			onClick(e, mousePos);
+			return true;
+		}
+		return false;
+	}
+
+	protected void onClick(MouseEvent e, Vector mousePos) {
+
 	}
 
 	@Override

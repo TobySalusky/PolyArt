@@ -38,9 +38,13 @@ public class Main extends JPanel {
     private final Graphics g;
     private final Timer timer;
 
+    public static float deltaTime = 0F;
+
 
     private static final List<Screen> screenList = new ArrayList<>();
     public static Screen screen;
+
+    private long lastMiliTime = System.currentTimeMillis();
 
     public static TextBox typingIn;
 
@@ -76,9 +80,15 @@ public class Main extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            screen.update();
+
+            long current = System.currentTimeMillis();
+
+            deltaTime = (current - lastMiliTime) / 1000F;
+            screen.update(deltaTime);
             screen.render(g);
             repaint();
+
+            lastMiliTime = current;
         }
     }
 
