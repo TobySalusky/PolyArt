@@ -96,8 +96,8 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 
 		MultiPanel openMulti = new MultiPanel(UIPanel.HORIZONTAL, 0, Main.WIDTH - 200);
 		multi.addPanel(openMulti);
-		openMulti.addPanel(new OpenPanel(UIPanel.VERTICAL, 0, Main.HEIGHT - 150));
-		animationPanel = new AnimationPanel(UIPanel.VERTICAL, Main.HEIGHT, -150);
+		openMulti.addPanel(new OpenPanel(UIPanel.VERTICAL, 0, Main.HEIGHT - 10));
+		animationPanel = new AnimationPanel(UIPanel.VERTICAL, Main.HEIGHT, -10);
 		openMulti.addPanel(animationPanel);
 
 
