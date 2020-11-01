@@ -800,7 +800,9 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				}
 				break;
 
-
+			case (KeyEvent.VK_U):
+				System.out.println(JsonWriter.objectToJson(editPoly));
+				break;
 
 			case (KeyEvent.VK_I):
 				if (editType == EditType.edges) {

@@ -1,5 +1,6 @@
 package transformation;
 
+import poly.Polygon;
 import util.Vector;
 
 import java.util.List;
@@ -21,6 +22,12 @@ public abstract class Transform {
 
 	public void remove(List<Vector> verts) {
 		reverse().apply(verts);
+	}
+
+	public Polygon appliedTo(Polygon polygon) {
+		Polygon poly = polygon.cloneGeom();
+		apply(poly.getVertices());
+		return poly;
 	}
 
 }

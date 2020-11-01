@@ -1,7 +1,9 @@
 package modifiers;
 
+import main.Main;
 import poly.EdgeSequence;
 import poly.Polygon;
+import ui.FuncButton;
 import ui.IntTextBox;
 import ui.panels.ModifierPanel;
 import ui.premade.ModifierTab;
@@ -15,6 +17,8 @@ import java.util.List;
 public class SolidifyEdges extends Modifier {
 
 	private float width = 30F;
+	private float[] widths;
+	private Polygon weightPoly;
 
 	@Override
 	public Polygon[] create(Polygon[] polygons) {
@@ -33,7 +37,6 @@ public class SolidifyEdges extends Modifier {
 		List<Vector> verts = polygon.getVertices();
 		if (verts.size() < 2) return solid;
 
-		float half = width / 2;
 		boolean wrap = !(polygon instanceof EdgeSequence);
 
 		for (int i = 0; i < verts.size(); i++) {
@@ -62,6 +65,7 @@ public class SolidifyEdges extends Modifier {
 				angle += other;
 				angle /= 2;
 			}
+			float half = (widths == null) ? width / 2 : widths[i];
 			solid.insertPoint(point.added(new Polar(half, angle + Maths.HalfPI)), i);
 			solid.insertPoint(point.added(new Polar(half, angle - Maths.HalfPI)), i + 1);
 		}
@@ -78,6 +82,16 @@ public class SolidifyEdges extends Modifier {
 		return solid;
 	}
 
+	private void toggleWeights() {
+		if (weightPoly == null) {
+
+			Main.debugScreen().getLayer().getPolygons();
+		} else {
+			Main.debugScreen().getLayer().getPolygons().remove(weightPoly); // ?!!!!
+			weightPoly = null;
+		}
+	}
+
 	@Override
 	public ModifierTab createTab(ModifierPanel panel) {
 		return new Panel(panel);
@@ -91,6 +105,8 @@ public class SolidifyEdges extends Modifier {
 		@Override
 		protected void onOpen() {
 			elements.add(new IntTextBox.Func(i -> width = i, (int) width, 0, 0, 0, 0));
+			elements.add(new FuncButton(SolidifyEdges.this::toggleWeights, 0, 0, 0, 0));
+
 		}
 
 		@Override

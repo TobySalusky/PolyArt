@@ -10,13 +10,13 @@ import util.Vector;
 
 import java.awt.Graphics;
 
-public class SpaceObject implements GameObject {
+public class Entity implements GameObject {
 
 	protected Vector pos, vel = new Vector();
 	protected float angle;
 	protected Polygon model;
 
-	public SpaceObject(Vector pos) {
+	public Entity(Vector pos) {
 		this.pos = pos.copy();
 	}
 

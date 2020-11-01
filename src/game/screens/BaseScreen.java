@@ -1,9 +1,8 @@
 package game.screens;
 
 import game.Driver;
-import game.ships.Asteroid;
-import game.ships.PlayerShip;
-import game.ships.SpaceObject;
+import game.ships.Player;
+import game.ships.Entity;
 import perspective.Camera;
 import util.Colors;
 import util.Maths;
@@ -22,12 +21,12 @@ public class BaseScreen implements GameScreen {
 
 	// objects
 	private final Camera camera = new Camera(0, 0, 5);
-	private PlayerShip player = new PlayerShip(Vector.zero);
-	private List<SpaceObject> spaceObjects = new ArrayList<>();
+	private Player player = new Player(Vector.zero);
+	private List<Entity> entities = new ArrayList<>();
 
 	public BaseScreen() {
 		float spawnRange = 500;
-		IntStream.range(0, 10).forEach(i -> spaceObjects.add(new Asteroid(new Vector(Maths.random(-spawnRange, spawnRange), Maths.random(-spawnRange, spawnRange)))));
+		//IntStream.range(0, 10).forEach(i -> entities.add(new Asteroid(new Vector(Maths.random(-spawnRange, spawnRange), Maths.random(-spawnRange, spawnRange)))));
 
 	}
 
@@ -37,9 +36,9 @@ public class BaseScreen implements GameScreen {
 
 		player.update(deltaTime);
 
-		spaceObjects.forEach(o -> o.update(deltaTime));
+		entities.forEach(o -> o.update(deltaTime));
 
-		camera.move(player.getPos().subbed(camera.copyPos()));
+		camera.move(player.getPos().subbed(camera.copyPos()).multed(0.1F));
 	}
 
 	private void handlePlayerInput(float deltaTime) {
@@ -59,7 +58,7 @@ public class BaseScreen implements GameScreen {
 		g.setColor(Colors.background);
 		g.fillRect(0, 0, Driver.WIDTH, Driver.HEIGHT);
 
-		spaceObjects.forEach(o -> o.render(g, camera));
+		entities.forEach(o -> o.render(g, camera));
 		player.render(g, camera);
 	}
 
