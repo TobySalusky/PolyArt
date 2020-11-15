@@ -1,7 +1,6 @@
-package game.ships;
+package game.entities;
 
 import com.cedarsoftware.util.io.JsonReader;
-import com.cedarsoftware.util.io.JsonWriter;
 import poly.Polygon;
 import transformation.RotateTransform;
 import transformation.ScaleTransform;
@@ -9,7 +8,6 @@ import util.Maths;
 import util.Vector;
 
 public class Player extends Entity {
-
 
 	private static final Polygon bodyPoly;
 

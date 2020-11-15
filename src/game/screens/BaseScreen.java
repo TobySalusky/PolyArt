@@ -1,18 +1,16 @@
 package game.screens;
 
 import game.Driver;
-import game.ships.Player;
-import game.ships.Entity;
+import game.entities.Player;
+import game.entities.Entity;
 import perspective.Camera;
 import util.Colors;
-import util.Maths;
 import util.Vector;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class BaseScreen implements GameScreen {
 
@@ -38,7 +36,7 @@ public class BaseScreen implements GameScreen {
 
 		entities.forEach(o -> o.update(deltaTime));
 
-		camera.move(player.getPos().subbed(camera.copyPos()).multed(0.1F));
+		camera.move(player.getPos().subbed(camera.copyPos()).multed(deltaTime));
 	}
 
 	private void handlePlayerInput(float deltaTime) {

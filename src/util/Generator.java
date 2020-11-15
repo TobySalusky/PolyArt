@@ -23,4 +23,16 @@ public class Generator {
 		edge.addPoint(mid.added(Vector.up.multed(size * -0.5F)));
 		return edge;
 	}
+
+	public static Polygon genNGon(Vector mid, float radiusSize, int n) {
+		Polygon nGon = new Polygon(Color.WHITE);
+
+		for (int i = 0; i < n; i++) {
+			float angle = Maths.TwoPI * ((float)n / i);
+
+			nGon.getVertices().add(new Polar(radiusSize, angle));
+		}
+
+		return nGon;
+	}
 }

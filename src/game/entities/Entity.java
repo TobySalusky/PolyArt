@@ -1,4 +1,4 @@
-package game.ships;
+package game.entities;
 
 import game.base.GameObject;
 import perspective.Camera;
