@@ -17,6 +17,15 @@ public class Generator {
 		return square;
 	}
 
+	public static Polygon genScreenRect() {
+		Polygon square = new Polygon(Color.WHITE);
+		square.addPoint(new Vector(0, 0));
+		square.addPoint(new Vector(1980, 0));
+		square.addPoint(new Vector(1980, 1080));
+		square.addPoint(new Vector(0, 1080));
+		return square;
+	}
+
 	public static Polygon genEdgePoly(Vector mid, float size) {
 		Polygon edge = new EdgeSequence(Color.WHITE);
 		edge.addPoint(mid.added(Vector.up.multed(size *  0.5F)));

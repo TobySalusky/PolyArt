@@ -5,7 +5,7 @@ public class Vector {
     public float x;
     public float y;
 
-    public final static Vector one = new Vector(1, 1), zero = new Vector(0, 0), up = new Vector(1, 0), right = new Vector(0, 1);
+    public final static Vector one = new Vector(1, 1), zero = new Vector(0, 0), up = new Vector(0, 1), down = new Vector(0, -1), right = new Vector(1, 0);
 
     public Vector() { }
 

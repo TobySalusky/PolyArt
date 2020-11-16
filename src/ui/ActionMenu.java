@@ -92,6 +92,16 @@ public abstract class ActionMenu extends UIContainer { // this is one of those s
 				screen.getSelectedPolygons().add(square);
 				screen.setEditPoly(square);
 			}, 0, 0, 0, 0));
+
+			elements.add(new SimpleFuncButton(() -> {
+				PolyScreen screen = ((PolyScreen)Main.screen);
+				Polygon square = Generator.genScreenRect();
+				square.setColor(screen.getSelectedColor());
+				screen.getLayer().getPolygons().add(square);
+				screen.getSelectedPolygons().clear();
+				screen.getSelectedPolygons().add(square);
+				screen.setEditPoly(square);
+			}, 0, 0, 0, 0));
 		}
 	}
 }

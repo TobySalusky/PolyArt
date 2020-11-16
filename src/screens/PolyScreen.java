@@ -8,9 +8,7 @@ import modifiers.Modifier;
 import modifiers.SolidifyEdges;
 import modifiers.SubdivisionModifier;
 import perspective.Camera;
-import poly.Axis;
-import poly.Edge;
-import poly.PolyLayer;
+import poly.*;
 import poly.Polygon;
 import transformation.*;
 import ui.*;
@@ -801,7 +799,26 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				break;
 
 			case (KeyEvent.VK_U):
-				System.out.println(JsonWriter.objectToJson(editPoly));
+
+				if (e.isShiftDown()) {
+
+					if (selectedPolygons.size() == 0) {
+						System.out.println("couldn't output model because no polygons were selected");
+						break;
+					}
+
+					ArrayList<Polygon> modelPolys = new ArrayList<>();
+					for (Polygon poly : layer.getPolygons()) {
+						if (selectedPolygons.contains(poly)) {
+							modelPolys.add(poly);
+						}
+					}
+					Model model = new Model(modelPolys);
+					System.out.println(JsonWriter.objectToJson(model));
+
+				} else {
+					System.out.println(JsonWriter.objectToJson(editPoly));
+				}
 				break;
 
 			case (KeyEvent.VK_I):

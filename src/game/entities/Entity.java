@@ -2,6 +2,7 @@ package game.entities;
 
 import game.base.GameObject;
 import perspective.Camera;
+import poly.Model;
 import poly.Polygon;
 import util.Generator;
 import util.Maths;
@@ -13,8 +14,8 @@ import java.awt.Graphics;
 public class Entity implements GameObject {
 
 	protected Vector pos, vel = new Vector();
-	protected float angle;
-	protected Polygon model;
+	protected Model model;
+	private Vector lastPos = new Vector();
 
 	public Entity(Vector pos) {
 		this.pos = pos.copy();
@@ -23,25 +24,25 @@ public class Entity implements GameObject {
 	@Override
 	public void update(float deltaTime) {
 		pos.add(vel.multed(deltaTime));
-		float toAngle = vel.angle();
-		angle = Maths.correctAngle(angle, toAngle);
-		angle += (toAngle - angle) * deltaTime * 5;
-
-		applyFriction(deltaTime);
 	}
 
-	protected void applyFriction(float deltaTime) {
-		Vector friction = new Polar(vel.mag() * 0.9F * deltaTime, vel.angle());
-		vel.sub(friction);
+	public void tryClick(Vector pos) {
+		if (model.pointCollision(pos)) {
+			clicked(pos);
+		}
 	}
 
-	@Override
+	public void clicked(Vector pos) {
+
+	}
+
+		@Override
 	public void render(Graphics g, Camera camera) {
-		model = unbakedModel().cloneGeom();
-		model.getVertices().forEach(v -> {
-			v.rotateAround(angle, Vector.zero);
-			v.add(pos);
-		});
+
+		model.polygons.forEach(p -> p.getVertices().forEach(v -> v.sub(lastPos)));
+		model.polygons.forEach(p -> p.getVertices().forEach(v -> v.add(pos)));
+		lastPos = pos.copy();
+
 		model.render(g, camera);
 	}
 

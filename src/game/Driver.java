@@ -64,7 +64,7 @@ public class Driver extends JPanel {
 		timer = new Timer(0, new TimerListener());
 		timer.start();
 		addMouseListener(new Mouse());
-		//addMouseMotionListener(new MouseMotion());
+		addMouseMotionListener(new MouseMotion());
 		//addMouseWheelListener(new MouseWheel());
 		addKeyListener(new Keyboard());
 		setFocusable(true);

@@ -1,5 +1,6 @@
 package game.screens;
 
+import game.Game;
 import util.Vector;
 
 import java.awt.Graphics;
@@ -33,11 +34,11 @@ public interface GameScreen {
     }
 
     default void mouseMove(MouseEvent e) {
-
+        Game.mousePos.setTo(mousePos(e));
     }
 
     default void mouseDrag(MouseEvent e) {
-
+        Game.mousePos.setTo(mousePos(e));
     }
 
     default void keyDown(KeyEvent e) {

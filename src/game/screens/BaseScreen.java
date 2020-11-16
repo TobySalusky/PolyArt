@@ -1,98 +1,90 @@
 package game.screens;
 
-import game.Driver;
-import game.entities.Player;
+import game.Game;
+import game.Models;
+import game.entities.Cloud;
+import game.entities.Part;
 import game.entities.Entity;
 import perspective.Camera;
-import util.Colors;
+import poly.Model;
+import util.Gizmo;
+import util.Maths;
 import util.Vector;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BaseScreen implements GameScreen {
 
-	// input
-	private boolean wDown, aDown, sDown, dDown;
-
 	// objects
-	private final Camera camera = new Camera(0, 0, 5);
-	private Player player = new Player(Vector.zero);
-	private List<Entity> entities = new ArrayList<>();
+	private final Camera camera = new Camera(1920 / 2F, 1080 / 2F, 1);
+	private final List<Entity> entities = new ArrayList<>();
+	private final List<Cloud> clouds = new ArrayList<>();
+	private final Model background;
 
 	public BaseScreen() {
-		float spawnRange = 500;
-		//IntStream.range(0, 10).forEach(i -> entities.add(new Asteroid(new Vector(Maths.random(-spawnRange, spawnRange), Maths.random(-spawnRange, spawnRange)))));
+		background = Models.background;
 
+		entities.add(new Part(new Vector(500, 0), Models.cockpit));
+
+		for (int i = 0; i < 7; i++) {
+			clouds.add(new Cloud(Maths.random(1920)));
+		}
 	}
 
-	@Override
-	public void update(float deltaTime) {
-		handlePlayerInput(deltaTime);
+	public void handleClouds() {
+		if (clouds.size() < 7) {
+			clouds.add(new Cloud(-100));
+		}
 
-		player.update(deltaTime);
-
-		entities.forEach(o -> o.update(deltaTime));
-
-		camera.move(player.getPos().subbed(camera.copyPos()).multed(deltaTime));
-	}
-
-	private void handlePlayerInput(float deltaTime) {
-		int xAxis = 0, yAxis = 0;
-
-		if (aDown) xAxis--;
-		if (dDown) xAxis++;
-
-		if (wDown) yAxis--;
-		if (sDown) yAxis++;
-
-		player.handleInput(xAxis, yAxis, deltaTime);
-	}
-
-	@Override
-	public void render(Graphics g) {
-		g.setColor(Colors.background);
-		g.fillRect(0, 0, Driver.WIDTH, Driver.HEIGHT);
-
-		entities.forEach(o -> o.render(g, camera));
-		player.render(g, camera);
-	}
-
-	@Override
-	public void keyDown(KeyEvent e) {
-		switch (e.getKeyCode()) {
-			case KeyEvent.VK_W:
-				wDown = true;
-				break;
-			case KeyEvent.VK_A:
-				aDown = true;
-				break;
-			case KeyEvent.VK_S:
-				sDown = true;
-				break;
-			case KeyEvent.VK_D:
-				dDown = true;
-				break;
+		for (int i = 0; i < clouds.size(); i++) {
+			Cloud cloud = clouds.get(i);
+			float x = cloud.getPos().x;
+			if (x > 2100) {
+				clouds.remove(i);
+				i--;
+			}
 		}
 	}
 
 	@Override
-	public void keyUp(KeyEvent e) {
-		switch (e.getKeyCode()) {
-			case KeyEvent.VK_W:
-				wDown = false;
-				break;
-			case KeyEvent.VK_A:
-				aDown = false;
-				break;
-			case KeyEvent.VK_S:
-				sDown = false;
-				break;
-			case KeyEvent.VK_D:
-				dDown = false;
-				break;
+	public void update(float deltaTime) {
+
+		handleClouds();
+
+		entities.forEach(o -> o.update(deltaTime));
+		clouds.forEach(o -> o.update(deltaTime));
+
+
+	}
+
+	@Override
+	public void render(Graphics g) {
+		background.render(g, camera);
+
+		clouds.forEach(o -> o.render(g, camera));
+		entities.forEach(o -> o.render(g, camera));
+
+
+		Gizmo.dot(g, Game.mousePos);
+	}
+
+	@Override
+	public void mouseDown(MouseEvent e) {
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			Game.mouseDown = true;
+
+			entities.forEach(ent -> ent.tryClick(Game.mousePos));
+		}
+	}
+
+	@Override
+	public void mouseUp(MouseEvent e) {
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			Game.mouseDown = false;
 		}
 	}
 }
