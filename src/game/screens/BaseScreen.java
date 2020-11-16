@@ -27,8 +27,12 @@ public class BaseScreen implements GameScreen {
 
 	public BaseScreen() {
 		background = Models.background;
-
+		
+		entities.add(new Part(new Vector(1500, 0), Models.passenger_body));
 		entities.add(new Part(new Vector(500, 0), Models.cockpit));
+		entities.add(new Part(new Vector(800, 0), Models.square_wing));
+		entities.add(new Part(new Vector(1200, 0), Models.swept_back_wing));
+
 
 		for (int i = 0; i < 7; i++) {
 			clouds.add(new Cloud(Maths.random(1920)));
