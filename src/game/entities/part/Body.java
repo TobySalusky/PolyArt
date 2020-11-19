@@ -1,5 +1,6 @@
 package game.entities.part;
 
+import game.Models;
 import game.building.SnapPoint;
 import poly.Model;
 import util.Vector;
@@ -15,6 +16,18 @@ public class Body extends Part {
 		snapPoints.add(new SnapPoint(model.backToPointLinked(3), partTypes.tail));
 		snapPoints.add(new SnapPoint(model.backToPointLinked(4), partTypes.wings));
 		snapPoints.add(new SnapPoint(model.backToPointLinked(5), partTypes.head));
+	}
+
+	public static class PassengerBody extends Body {
+
+		public PassengerBody(Vector pos) {
+			super(pos, Models.passenger_body);
+			weight = 5;
+			drag = 1;
+			lift = 0;
+			thrust = 0;
+
+		}
 	}
 
 
