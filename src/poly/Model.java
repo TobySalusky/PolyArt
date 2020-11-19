@@ -43,6 +43,12 @@ public class Model {
 		polygons.forEach(p -> p.getVertices().forEach(v -> v.sub(mid)));
 	}
 
+	public void scale(float scalar) {
+
+		polygons.forEach(p -> p.getVertices().forEach(v -> v.mult(scalar)));
+
+	}
+
 	public Vector[] findRange() {
 		Vector[] init = polygons.get(0).findRange();
 		Vector tl = init[0], br = init[1];

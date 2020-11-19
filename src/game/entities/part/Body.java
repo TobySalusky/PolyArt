@@ -30,5 +30,21 @@ public class Body extends Part {
 		}
 	}
 
+	public static class HelicopterBody extends Body {
+
+		public HelicopterBody(Vector pos) {
+			super(pos, Models.helicopterBody);
+
+			// todo: sam
+			
+
+
+			snapPoints.clear();
+			snapPoint = model.backToPointLinked(1);
+			snapPoints.add(new SnapPoint(model.backToPointLinked(2), partTypes.topper));
+			snapPoints.add(new SnapPoint(model.backToPointLinked(3), partTypes.tail));
+		}
+	}
+
 
 }

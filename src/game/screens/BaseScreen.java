@@ -70,6 +70,9 @@ public class BaseScreen implements GameScreen {
 		parts.add(new Wings(new Vector(500, 0), Models.jetWings));
 		parts.add(new Topper(new Vector(500, 0), Models.jetTopper));
 
+		parts.add(new Body.HelicopterBody(new Vector(500, 0)));
+		parts.add(new Tail(new Vector(500, 0), Models.helicopterTail));
+
 		genClouds();
 
 		npc = genNpc();
