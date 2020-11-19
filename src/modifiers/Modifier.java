@@ -28,6 +28,7 @@ public abstract class Modifier {
 
 	public boolean shouldChange(Polygon polygon) {
 		if (visible) {
+			if (Main.screen == null) return true;
 			if (((PolyScreen)Main.screen).editMode()) {
 				return showEdit;
 			}

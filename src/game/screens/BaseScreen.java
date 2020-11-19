@@ -52,10 +52,28 @@ public class BaseScreen implements GameScreen {
 			clouds.add(new Cloud(Maths.random(1920)));
 		}
 
-		npc = new NPC.Kalpana(new Vector(1720, 950));
+		npc = genNpc();
 	}
 
-	public void startSimulation() {
+	public NPC genNpc() {
+		int npcNum = Maths.randomInt(5);
+
+		switch (npcNum) {
+			case 0:
+				return new NPC.Kalpana(new Vector(1720, 950));
+			case 1:
+				return new NPC.Mae(new Vector(1720, 950));
+			case 2:
+				return new NPC.Guion(new Vector(1720, 950));
+			case 3:
+				return new NPC.Leroy(new Vector(1720, 950));
+			case 4:
+				return new NPC.Sylvia(new Vector(1720, 950));
+		}
+		return null;
+	}
+
+	public void calcWeights() {
 		collectParts();
 
 		for (Part part : parts) {
@@ -103,17 +121,11 @@ public class BaseScreen implements GameScreen {
 		}
 	}
 
-	public void handleSnaps() {
-
-
-
-	}
-
 	@Override
 	public void update(float deltaTime) {
 
 		genSnaps();
-		handleSnaps();
+		calcWeights();
 
 		handleClouds();
 

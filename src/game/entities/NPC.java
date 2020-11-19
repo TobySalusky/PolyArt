@@ -27,7 +27,7 @@ public class NPC extends Entity {
 
 		tips.add("Plus icons show where you can add parts.");
 		tips.add("Start constructing by putting an aircraft body on the central plus icon.");
-		tips.add("When finished making your aircraft, you can test it using the 'Simulate' button.");
+		//tips.add("When finished making your aircraft, you can test it using the 'Simulate' button.");
 
 	}
 
@@ -39,7 +39,7 @@ public class NPC extends Entity {
 		addText("Various parts are scattered across the ground, as you can see.", 8);
 		addText("Parts only fit with other parts of types they are meant to attach to, but feel free to pick any part from each selection.", 14);
 		addText("Drag parts from the ground to the plus icons, to construct your aircraft, starting with a body-segment.", 10);
-		addText("When you're happy with the combination you've made, try it out using the 'Simulate' button.", 10);
+		//addText("When you're happy with the combination you've made, try it out using the 'Simulate' button.", 10);
 	}
 
 	public void addText(String text, float seconds) {
@@ -80,7 +80,15 @@ public class NPC extends Entity {
 	@Override
 	public void clicked(Vector pos) {
 
-		if (queuedText.size() > 0) return;
+		if (queuedText.size() > 0) {
+
+			if ((int) (timeSince / 0.025F) < text.length()) {
+				timeSince += 100;
+			} else {
+				timeLeft = 0;
+			}
+			return;
+		}
 
 		startText(tips.get(tipIndex % tips.size()), 10);
 		tipIndex++;
@@ -96,7 +104,7 @@ public class NPC extends Entity {
 			Vector tl = new Vector(1350, 750 - height);
 
 			g.setColor(Color.WHITE);
-			g.fillRect(1350 - 5, 750 - height, 250 + 10, height+10);
+			g.fillRect(1350 - 5, 750 - height, 250 + 10, height + 10);
 			TextUtil.drawWrappedText(g, Color.BLACK, currentText, 250, tl);
 		}
 	}
@@ -124,6 +132,75 @@ public class NPC extends Entity {
 		@Override
 		public String getDescription() {
 			return "an American astronaut, aerospace engineer, and the first Indian woman to go to space";
+		}
+	}
+
+	public static class Sylvia extends NPC {
+
+		public Sylvia(Vector pos) {
+			super(pos);
+			model = Models.sylvia;
+		}
+
+		@Override
+		public String getName() {
+			return "Sylvia Acevedo";
+		}
+
+		@Override
+		public String getDescription() {
+			return "a former American aerospace engineer and businesswoman. I started my career in NASA's Jet Propulsion Laboratory";
+		}
+	}
+
+	public static class Guion extends NPC {
+		public Guion(Vector pos) {
+			super(pos);
+			model = Models.guion;
+		}
+
+		@Override
+		public String getName() {
+			return "Guion Bluford";
+		}
+
+		@Override
+		public String getDescription() {
+			return "an American aerospace engineer, as well as retired U.S. Air Force officer, fighter pilot, and former NASA astronaut, being the first African American to go to space";
+		}
+	}
+
+	public static class Mae extends NPC {
+		public Mae(Vector pos) {
+			super(pos);
+			model = Models.mae;
+		}
+
+		@Override
+		public String getName() {
+			return "Mae Jemison";
+		}
+
+		@Override
+		public String getDescription() {
+			return "an American aerospace engineer, physician, and former NASA astronaut. I became the first black woman to travel into space when I served as a mission specialist aboard the space shuttle Endeavour.";
+		}
+	}
+
+	public static class Leroy extends NPC {
+		public Leroy(Vector pos) {
+			super(pos);
+			model = Models.leroy;
+		}
+
+		@Override
+		public String getName() {
+			return "Leroy Chiao";
+		}
+
+		@Override
+		public String getDescription() {
+			return "an American chemical engineer, retired NASA astronaut, entrepreneur, and engineering consultant. I flew on three space shuttle flights, and commanded Expedition 10.";
 		}
 	}
 }
