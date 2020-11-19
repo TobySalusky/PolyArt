@@ -35,4 +35,15 @@ public class Tail extends Part {
 		}
 	}
 
+	public static class HelicopterTail extends Tail {
+
+		public HelicopterTail(Vector pos) {
+			super(pos, Models.helicopterTail);
+			weight = 4;
+			lift = 2;
+			thrust = 2;
+			drag = 2;
+		}
+	}
+
 }
