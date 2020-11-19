@@ -31,7 +31,7 @@ public class Wings extends Part {
 			super(pos, Models.jetWings);
 			weight = 1;
 			drag = 1;
-			lift = 8;
+			lift = 9;
 			thrust = 1;
 
 			clickAssist = true;

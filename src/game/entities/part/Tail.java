@@ -31,7 +31,7 @@ public class Tail extends Part {
 			drag = 2;
 			lift = 0;
 			weight = 3;
-			thrust = 4;
+			thrust = 5;
 
 			clickAssist = true;
 		}
