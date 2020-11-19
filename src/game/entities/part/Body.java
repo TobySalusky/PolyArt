@@ -35,7 +35,10 @@ public class Body extends Part {
 		public HelicopterBody(Vector pos) {
 			super(pos, Models.helicopterBody);
 
-			// todo: sam
+			weight = 2;
+			lift = 0;
+			thrust = 0;
+			drag = 4;
 
 
 			snapPoints.clear();
@@ -49,7 +52,7 @@ public class Body extends Part {
 
 		public JetBody(Vector pos) {
 			super(pos, Models.jetBody);
-			weight = 3;
+			weight = 4;
 			drag = 2;
 			thrust = 0;
 			lift = 0;
