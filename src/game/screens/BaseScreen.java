@@ -15,6 +15,7 @@ import util.Maths;
 import util.Vector;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class BaseScreen implements GameScreen {
 	private final List<Part> parts = new ArrayList<>();
 	private final List<Cloud> clouds = new ArrayList<>();
 	private final Model background;
+
+	private final Font font = new Font("Helvetica", Font.BOLD, 38);
 
 	public static List<SnapPoint> snapPoints = new ArrayList<>();
 	private SnapPoint bodySnap = new SnapPoint(new Vector(1920/2F, 1080/2F), Part.partTypes.body);
@@ -136,10 +139,11 @@ public class BaseScreen implements GameScreen {
 		parts.forEach(o -> o.render(g, camera));
 		npc.render(g, camera);
 
-
 		Gizmo.dot(g, Game.mousePos, Color.darkGray);
 
 		snapPoints.forEach(o -> o.render(g, camera));
+
+		createMeters(g);
 	}
 
 	@Override
@@ -162,5 +166,39 @@ public class BaseScreen implements GameScreen {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			Game.mouseDown = false;
 		}
+	}
+
+	public void createMeters(Graphics g) {
+		int x = 1370;
+		int y = 150;
+		int width = 500;
+		int height = 40;
+
+		int notchWidth = 10;
+
+		g.setColor(new Color(150,150,150));
+		g.fillRect(x,y,width,height);
+		g.fillRect(x,y+200,width,height);
+
+		g.setColor(Color.BLACK);
+		g.setFont(font);
+		g.drawString("Thrust",x,y-25);
+		g.drawString("Drag", x+width-100, y-25);
+		g.drawString("Lift", x, y+175);
+		g.drawString("Weight", x+width-125, y+175);
+
+		weight = 11;
+		thrust = 17;
+		drag = 8;
+		lift = 6;
+
+		float xForce = (thrust-drag);
+		float yForce = (lift-weight);
+
+		g.setColor(new Color((int)(25.5F*Math.abs(xForce)),(255-(int)(25.5F*Math.abs(xForce))),0));
+		g.fillRect((int)(x+(width/2)+(25*xForce)),y-5,notchWidth,height+10);
+
+		g.setColor(new Color((int)(25.5F*Math.abs(yForce)),(255-(int)(25.5F*Math.abs(yForce))),0));
+		g.fillRect((int)(x+(width/2)+(25*yForce)),y+195,notchWidth,height+10);
 	}
 }
