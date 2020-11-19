@@ -33,6 +33,8 @@ public class Wings extends Part {
 			drag = 1;
 			lift = 8;
 			thrust = 1;
+
+			clickAssist = true;
 		}
 	}
 

@@ -59,10 +59,12 @@ public class BaseScreen implements GameScreen {
 
 		parts.add(new Body.PassengerBody(new Vector(550, 0)));
 		parts.add(new Body.JetBody(new Vector(600, 0)));
+		parts.add(new Body.HelicopterBody(new Vector(650, 0)));
 
 
 		parts.add(new Tail.PassengerTail(new Vector(800, 0)));
 		parts.add(new Tail.JetTail(new Vector(850, 0)));
+		parts.add(new Tail.HelicopterTail(new Vector(850, 0)));
 
 
 		parts.add(new Wings.PassengerWings(new Vector(1050, 0)));
