@@ -13,7 +13,7 @@ public class Head extends Part {
 		partType = partTypes.head;
 
 		snapPoint = model.backToPointLinked(1);
-		snapPoints.add(new SnapPoint(model.backToPointLinked(2), partTypes.front));
+		// snapPoints.add(new SnapPoint(model.backToPointLinked(2), partTypes.front));
 	}
 
 	public static class PassengerHead extends Head {
@@ -31,7 +31,7 @@ public class Head extends Part {
 
 	public static class JetHead extends Head {
 
-		public JetHead(Vector pos, Model model) {
+		public JetHead(Vector pos) {
 			super(pos, Models.jetHead);
 			weight = 1;
 			lift = 0;

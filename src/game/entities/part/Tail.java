@@ -26,7 +26,7 @@ public class Tail extends Part {
 
 	public static class JetTail extends Tail {
 
-		public JetTail(Vector pos, Model model) {
+		public JetTail(Vector pos) {
 			super(pos, Models.jetTail);
 			drag = 2;
 			lift = 0;
