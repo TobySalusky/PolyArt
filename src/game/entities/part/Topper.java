@@ -36,6 +36,8 @@ public class Topper extends Part {
 			lift = 0;
 			thrust = 0;
 			drag = 1;
+
+			clickAssist = true;
 		}
 	}
 }

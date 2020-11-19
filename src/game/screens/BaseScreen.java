@@ -57,22 +57,19 @@ public class BaseScreen implements GameScreen {
 		parts.add(new Head.PassengerHead(new Vector(200, 0)));
 		parts.add(new Head.JetHead(new Vector(250, 0)));
 
-		parts.add(new Body.PassengerBody(new Vector(550, 0)));
-		parts.add(new Body.JetBody(new Vector(600, 0)));
-		parts.add(new Body.HelicopterBody(new Vector(650, 0)));
-
-
 		parts.add(new Tail.PassengerTail(new Vector(800, 0)));
 		parts.add(new Tail.JetTail(new Vector(850, 0)));
 		parts.add(new Tail.HelicopterTail(new Vector(850, 0)));
 
+		parts.add(new Body.PassengerBody(new Vector(550, 0)));
+		parts.add(new Body.JetBody(new Vector(600, 0)));
+		parts.add(new Body.HelicopterBody(new Vector(650, 0)));
 
 		parts.add(new Wings.PassengerWings(new Vector(1050, 0)));
 		parts.add(new Wings.JetWings(new Vector(1100, 0)));
 
 		parts.add(new Topper.HelicopterBlades(new Vector(1300, 0)));
-		//parts.add(new Topper.JetFin(new Vector(1300, 0)));
-
+		parts.add(new Topper.JetTopper(new Vector(1350, 0)));
 
 		genClouds();
 
