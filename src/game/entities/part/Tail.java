@@ -24,4 +24,15 @@ public class Tail extends Part {
 		}
 	}
 
+	public static class JetTail extends Tail {
+
+		public JetTail(Vector pos, Model model) {
+			super(pos, Models.jetTail);
+			drag = 2;
+			lift = 0;
+			weight = 3;
+			thrust = 4;
+		}
+	}
+
 }

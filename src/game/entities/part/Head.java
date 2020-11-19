@@ -28,4 +28,15 @@ public class Head extends Part {
 			snapPoint.add(4, -2);
 		}
 	}
+
+	public static class JetHead extends Head {
+
+		public JetHead(Vector pos, Model model) {
+			super(pos, Models.jetHead);
+			weight = 1;
+			lift = 0;
+			thrust = 0;
+			drag = 3;
+		}
+	}
 }
