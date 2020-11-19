@@ -14,7 +14,6 @@ public class Cloud extends Entity {
 
 		VecRect rect = model.findRect();
 		float area = rect.getWidth() * rect.getHeight();
-		System.out.println("area: " + area);
 
 		float mult = area / 20000F;
 

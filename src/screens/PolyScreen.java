@@ -798,6 +798,14 @@ public class PolyScreen implements Screen { // TODO: fix locked scaling - puts o
 				}
 				break;
 
+			case (KeyEvent.VK_O):
+				for (Polygon selectedPolygon : selectedPolygons) {
+					Color c = selectedPolygon.getColor();
+					Color newColor = new Color(c.getRed(), c.getGreen(), c.getBlue(), 120);
+					selectedPolygon.setColor(newColor);
+				}
+				break;
+
 			case (KeyEvent.VK_U):
 
 				if (e.isShiftDown()) {

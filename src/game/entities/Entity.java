@@ -14,7 +14,7 @@ import java.awt.Graphics;
 public class Entity implements GameObject {
 
 	protected Vector pos, vel = new Vector();
-	protected Model model;
+	public Model model;
 	private Vector lastPos = new Vector();
 
 	public Entity(Vector pos) {
@@ -26,10 +26,12 @@ public class Entity implements GameObject {
 		pos.add(vel.multed(deltaTime));
 	}
 
-	public void tryClick(Vector pos) {
+	public boolean tryClick(Vector pos) {
 		if (model.pointCollision(pos)) {
 			clicked(pos);
+			return true;
 		}
+		return false;
 	}
 
 	public void clicked(Vector pos) {

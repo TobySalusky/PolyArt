@@ -27,6 +27,14 @@ public class Model {
 		return new Model(copies);
 	}
 
+	public Polygon backIndex(int i) {
+		return polygons.get(polygons.size() - i);
+	}
+
+	public Vector backToPointLinked(int i) {
+		return backIndex(i).toPoint();
+	}
+
 	public void recenter() {
 		Vector[] range = findRange();
 

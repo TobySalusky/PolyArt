@@ -37,9 +37,9 @@ public class Generator {
 		Polygon nGon = new Polygon(Color.WHITE);
 
 		for (int i = 0; i < n; i++) {
-			float angle = Maths.TwoPI * ((float)n / i);
+			float angle = -Maths.HalfPI + Maths.TwoPI * ((float)i / n);
 
-			nGon.getVertices().add(new Polar(radiusSize, angle));
+			nGon.getVertices().add(mid.added(new Polar(radiusSize, angle)));
 		}
 
 		return nGon;

@@ -134,6 +134,10 @@ public class Polygon {
         return new VecRect(range[0].added(range[1]).multed(0.5F), range[1].subbed(range[0]));
     }
 
+    public Vector toPoint() {
+        return vertices.get(0);
+    }
+
     public Vector[] findRange() { // returns top-left and bottom-right points of rectangle around polygon
         Vector min = vertices.get(0);
         Vector max = vertices.get(0);

@@ -102,6 +102,36 @@ public abstract class ActionMenu extends UIContainer { // this is one of those s
 				screen.getSelectedPolygons().add(square);
 				screen.setEditPoly(square);
 			}, 0, 0, 0, 0));
+
+			elements.add(new SimpleFuncButton(() -> {
+				PolyScreen screen = ((PolyScreen)Main.screen);
+				Polygon square = Generator.genNGon(screen.getCamera().copyPos(), 100, 3);
+				square.setColor(screen.getSelectedColor());
+				screen.getLayer().getPolygons().add(square);
+				screen.getSelectedPolygons().clear();
+				screen.getSelectedPolygons().add(square);
+				screen.setEditPoly(square);
+			}, 0, 0, 0, 0));
+
+			elements.add(new SimpleFuncButton(() -> {
+				PolyScreen screen = ((PolyScreen)Main.screen);
+				Polygon square = Generator.genNGon(screen.getCamera().copyPos(), 100, 5);
+				square.setColor(screen.getSelectedColor());
+				screen.getLayer().getPolygons().add(square);
+				screen.getSelectedPolygons().clear();
+				screen.getSelectedPolygons().add(square);
+				screen.setEditPoly(square);
+			}, 0, 0, 0, 0));
+
+			elements.add(new SimpleFuncButton(() -> {
+				PolyScreen screen = ((PolyScreen)Main.screen);
+				Polygon square = Generator.genNGon(screen.getCamera().copyPos(), 100, 7);
+				square.setColor(screen.getSelectedColor());
+				screen.getLayer().getPolygons().add(square);
+				screen.getSelectedPolygons().clear();
+				screen.getSelectedPolygons().add(square);
+				screen.setEditPoly(square);
+			}, 0, 0, 0, 0));
 		}
 	}
 }

@@ -54,8 +54,14 @@ public class Driver extends JPanel {
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		g = image.getGraphics();
 
+		Font font = new Font("Helvetica", Font.BOLD, 16);
+		g.setFont(font);
+
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setStroke(new BasicStroke(3));
+
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		screen = new BaseScreen();
 		screenList.add(screen);
