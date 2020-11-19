@@ -9,7 +9,7 @@ public class Head extends Part {
 	public Head(Vector pos, Model model) {
 		super(pos, model);
 
-		partType = partTypes.wings;
+		partType = partTypes.head;
 
 		snapPoint = model.backToPointLinked(1);
 		snapPoints.add(new SnapPoint(model.backToPointLinked(2), partTypes.front));

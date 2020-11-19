@@ -6,10 +6,8 @@ import game.TextUtil;
 import game.building.SnapPoint;
 import game.entities.Cloud;
 import game.entities.NPC;
-import game.entities.part.Body;
-import game.entities.part.Part;
+import game.entities.part.*;
 import game.entities.Entity;
-import game.entities.part.Wings;
 import perspective.Camera;
 import poly.Model;
 import util.Gizmo;
@@ -45,8 +43,10 @@ public class BaseScreen implements GameScreen {
 		background = Models.background;
 
 		parts.add(new Part(new Vector(500, 0), Models.cockpit));
-		parts.add(new Body(new Vector(500, 0), Models.bodyTest));
-		parts.add(new Wings(new Vector(500, 0), Models.wingsTest));
+		parts.add(new Body(new Vector(500, 0), Models.passengerBody));
+		parts.add(new Wings(new Vector(500, 0), Models.passengerWings));
+		parts.add(new Tail(new Vector(500, 0), Models.passengerTail));
+		parts.add(new Head(new Vector(500, 0), Models.passengerHead));
 
 		for (int i = 0; i < 7; i++) {
 			clouds.add(new Cloud(Maths.random(1920)));
