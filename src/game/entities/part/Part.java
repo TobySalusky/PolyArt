@@ -83,6 +83,8 @@ public class Part extends Entity {
 
 	@Override
 	public void update(float deltaTime) {
+
+
 		vel.add(Vector.down.multed(gravity * deltaTime));
 
 		if (held && !Game.mouseDown) {

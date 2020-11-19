@@ -2,6 +2,7 @@ package game.building;
 
 import game.Models;
 import game.entities.part.Part;
+import game.screens.BaseScreen;
 import perspective.Camera;
 import poly.Model;
 import util.Gizmo;

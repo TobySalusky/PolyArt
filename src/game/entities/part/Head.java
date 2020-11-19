@@ -24,6 +24,8 @@ public class Head extends Part {
 			lift = 0;
 			thrust = 0;
 			drag = 5;
+
+			snapPoint.add(4, -2);
 		}
 	}
 }

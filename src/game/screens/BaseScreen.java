@@ -2,14 +2,15 @@ package game.screens;
 
 import game.Game;
 import game.Models;
-import game.TextUtil;
 import game.building.SnapPoint;
 import game.entities.Cloud;
 import game.entities.NPC;
+import game.entities.Plane;
+import game.entities.SimulateButton;
 import game.entities.part.*;
-import game.entities.Entity;
 import perspective.Camera;
 import poly.Model;
+import poly.Polygon;
 import util.Gizmo;
 import util.Maths;
 import util.Vector;
@@ -35,12 +36,20 @@ public class BaseScreen implements GameScreen {
 	private SnapPoint bodySnap = new SnapPoint(new Vector(1920/2F, 1080/2F), Part.partTypes.body);
 
 	// simulation
-	private List<Part> plane = new ArrayList<>();
+	private List<Part> planeParts = new ArrayList<>();
 	public float weight, lift, drag, thrust;
-	public boolean simulating;
+	public static boolean simulating;
 	public float simulTime;
+	public Vector accel = new Vector();
+
+	public Plane plane;
+	public Model planeModel;
 
 	public NPC npc;
+
+	public SimulateButton button = new SimulateButton(new Vector(130, 1000));
+
+	public static boolean triggerSim = false;
 
 	public BaseScreen() {
 		background = Models.background;
@@ -55,11 +64,22 @@ public class BaseScreen implements GameScreen {
 
 		parts.add(new Wings.PassengerWings(new Vector(500, 0)));
 
+		parts.add(new Head(new Vector(500, 0), Models.jetHead));
+		parts.add(new Tail(new Vector(500, 0), Models.jetTail));
+		parts.add(new Body(new Vector(500, 0), Models.jetBody));
+		parts.add(new Wings(new Vector(500, 0), Models.jetWings));
+		parts.add(new Topper(new Vector(500, 0), Models.jetTopper));
+
+		genClouds();
+
+		npc = genNpc();
+	}
+
+	public void genClouds() {
+		clouds.clear();
 		for (int i = 0; i < 7; i++) {
 			clouds.add(new Cloud(Maths.random(1920)));
 		}
-
-		npc = genNpc();
 	}
 
 	public NPC genNpc() {
@@ -88,7 +108,7 @@ public class BaseScreen implements GameScreen {
 		drag = 0;
 		thrust = 0;
 
-		for (Part part : plane) {
+		for (Part part : planeParts) {
 			weight += part.weight;
 			lift += part.lift;
 			drag += part.drag;
@@ -97,10 +117,10 @@ public class BaseScreen implements GameScreen {
 	}
 
 	public void collectParts() {
-		plane.clear();
+		planeParts.clear();
 		for (SnapPoint snapPoint : snapPoints) {
 			if (snapPoint.snapped != null) {
-				plane.add(snapPoint.snapped);
+				planeParts.add(snapPoint.snapped);
 			}
 		}
 	}
@@ -137,7 +157,47 @@ public class BaseScreen implements GameScreen {
 	public void update(float deltaTime) {
 
 		genSnaps();
-		calcWeights();
+
+		if (!simulating) {
+			calcWeights();
+		} else {
+
+			float xForce = thrust - drag;
+			float yForce = lift - weight;
+
+
+			if (simulTime > 3) {
+				accel = new Vector(-xForce * 30 - 20, -30 + -yForce * 30);
+
+				float start = 120;
+				float velX = plane.getVel().x * -1;
+				if (velX < start) {
+					accel.y = 80 * ((start - velX) / start);
+
+					System.out.println(velX + " " + plane.getVel().y);
+				}
+			} else if (simulTime > 2F) {
+				accel = new Vector(-150, -100);
+			} else if (simulTime > 1) {
+				accel = new Vector(-300, 0);
+			} else {
+				accel = new Vector();
+			}
+
+			if (simulTime > 1 && plane.getPos().y > 690) {
+				accel.add(Vector.right.multed(100));
+			}
+
+			plane.getVel().add(accel.multed(deltaTime));
+			plane.getVel().x = Math.min(plane.getVel().x, 0);
+			plane.update(deltaTime);
+
+			plane.getPos().y = Math.min(700, plane.getPos().y);
+
+			if (simulTime > 9) {
+				stopSim();
+			}
+		}
 
 		handleClouds();
 
@@ -149,6 +209,10 @@ public class BaseScreen implements GameScreen {
 
 		if (simulating) {
 			simulTime += deltaTime;
+		} else if (triggerSim) {
+			triggerSim = false;
+
+			startSim();
 		}
 	}
 
@@ -157,14 +221,25 @@ public class BaseScreen implements GameScreen {
 		background.render(g, camera);
 
 		clouds.forEach(o -> o.render(g, camera));
-		parts.forEach(o -> o.render(g, camera));
-		npc.render(g, camera);
 
-		Gizmo.dot(g, Game.mousePos, Color.darkGray);
+		if (!simulating) {
+			parts.forEach(o -> o.render(g, camera));
 
-		snapPoints.forEach(o -> o.render(g, camera));
+			npc.render(g, camera);
 
-		createMeters(g);
+			snapPoints.forEach(o -> o.render(g, camera));
+
+			createMeters(g);
+
+			button.render(g, camera);
+
+			Gizmo.dot(g, Game.mousePos, Color.darkGray);
+
+		} else {
+			Models.road.render(g, camera);
+
+			plane.render(g, camera);
+		}
 	}
 
 	@Override
@@ -172,14 +247,39 @@ public class BaseScreen implements GameScreen {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			Game.mouseDown = true;
 
+			if (simulating) return;
 			for (int i = parts.size() - 1; i >= 0; i--) {
 				if (parts.get(i).tryClick(Game.mousePos)) break;
 			}
 
 			npc.tryClick(Game.mousePos);
-		} else if (e.getButton() == MouseEvent.BUTTON3) {
-			System.out.println("mouse " + Game.mousePos);
+
+			button.tryClick(Game.mousePos);
 		}
+	}
+
+	public void startSim() {
+		if (planeParts.size() == 0) return;
+
+		genClouds();
+
+		if (!simulating) {
+			List<Polygon> polys = new ArrayList<>();
+			planeParts.forEach(p -> p.model.polygons.forEach(o -> polys.add(o.cloneGeom())));
+
+			planeModel = new Model(polys);
+			planeModel.recenter();
+
+			plane = new Plane(new Vector(1600, 700), planeModel);
+		}
+
+		simulating = true;
+		simulTime = 0;
+	}
+
+	public void stopSim() {
+		genClouds();
+		simulating = false;
 	}
 
 	@Override

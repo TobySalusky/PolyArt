@@ -30,7 +30,7 @@ public class NPC extends Entity {
 
 		tips.add("Plus icons show where you can add parts.");
 		tips.add("Start constructing by putting an aircraft body on the central plus icon.");
-		//tips.add("When finished making your aircraft, you can test it using the 'Simulate' button.");
+		tips.add("Construct your aircraft facing left.");
 
 	}
 
