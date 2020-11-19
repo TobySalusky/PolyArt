@@ -45,11 +45,13 @@ public class BaseScreen implements GameScreen {
 	public BaseScreen() {
 		background = Models.background;
 
-		parts.add(new Part(new Vector(500, 0), Models.cockpit));
-		parts.add(new Body(new Vector(500, 0), Models.passengerBody));
-		parts.add(new Wings(new Vector(500, 0), Models.passengerWings));
-		parts.add(new Tail(new Vector(500, 0), Models.passengerTail));
-		parts.add(new Head(new Vector(500, 0), Models.passengerHead));
+		parts.add(new Body.PassengerBody(new Vector(500, 0)));
+
+		parts.add(new Head.PassengerHead(new Vector(500, 0)));
+
+		parts.add(new Tail.PassengerTail(new Vector(500, 0)));
+
+		parts.add(new Wings.PassengerWings(new Vector(500, 0)));
 
 		for (int i = 0; i < 7; i++) {
 			clouds.add(new Cloud(Maths.random(1920)));
@@ -79,7 +81,12 @@ public class BaseScreen implements GameScreen {
 	public void calcWeights() {
 		collectParts();
 
-		for (Part part : parts) {
+		weight = 0;
+		lift = 0;
+		drag = 0;
+		thrust = 0;
+
+		for (Part part : plane) {
 			weight += part.weight;
 			lift += part.lift;
 			drag += part.drag;
@@ -198,11 +205,6 @@ public class BaseScreen implements GameScreen {
 		g.drawString("Drag", x+width-100, y-25);
 		g.drawString("Lift", x, y+175);
 		g.drawString("Weight", x+width-125, y+175);
-
-		weight = 11;
-		thrust = 17;
-		drag = 8;
-		lift = 6;
 
 		float xForce = (thrust-drag);
 		float yForce = (lift-weight);

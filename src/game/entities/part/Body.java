@@ -21,7 +21,7 @@ public class Body extends Part {
 	public static class PassengerBody extends Body {
 
 		public PassengerBody(Vector pos) {
-			super(pos, Models.passenger_body);
+			super(pos, Models.passengerBody);
 			weight = 5;
 			drag = 1;
 			lift = 0;

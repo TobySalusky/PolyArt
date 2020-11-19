@@ -6,6 +6,7 @@ import perspective.Camera;
 import util.Vector;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,8 @@ public class NPC extends Entity {
 	private String currentText;
 	private float timeLeft;
 	private float timeSince;
+
+	private static final Font font = new Font("Helvetica", Font.BOLD, 16);
 
 	private final List<String> queuedText = new ArrayList<>();
 
@@ -90,8 +93,16 @@ public class NPC extends Entity {
 			return;
 		}
 
-		startText(tips.get(tipIndex % tips.size()), 10);
-		tipIndex++;
+		if (timeLeft > 0) {
+			if ((int) (timeSince / 0.025F) < text.length()) {
+				timeSince += 100;
+			} else {
+				timeLeft = 0;
+			}
+		} else {
+			startText(tips.get(tipIndex % tips.size()), 10);
+			tipIndex++;
+		}
 	}
 
 	@Override
@@ -99,6 +110,8 @@ public class NPC extends Entity {
 		super.render(g, camera);
 
 		if (text != null) {
+			g.setFont(font);
+
 			int height = TextUtil.drawWrappedText(g, text, 250, new Vector(0, 2000));
 
 			Vector tl = new Vector(1350, 750 - height);

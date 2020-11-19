@@ -5,7 +5,7 @@ import poly.Model;
 
 public class Models {
 
-	public static Model background, cockpit, bodyTest, wingsTest, addButton, square_wing, swept_back_wing, passenger_body;
+	public static Model background, cockpit, bodyTest, wingsTest, addButton;
 	public static Model kalpana, sylvia, guion, mae, leroy;
 	public static Model[] clouds;
 	public static Model passengerBody, passengerHead, passengerTail, passengerWings;

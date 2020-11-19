@@ -18,7 +18,7 @@ public class Head extends Part {
 
 	public static class PassengerHead extends Head {
 
-		public PassengerHead(Vector pos, Model model) {
+		public PassengerHead(Vector pos) {
 			super(pos, Models.passengerHead);
 			weight = 2;
 			lift = 0;

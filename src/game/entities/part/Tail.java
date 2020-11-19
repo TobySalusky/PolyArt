@@ -15,7 +15,7 @@ public class Tail extends Part {
 
 	public static class PassengerTail extends Tail {
 
-		public PassengerTail(Vector pos, Model model) {
+		public PassengerTail(Vector pos) {
 			super(pos, Models.passengerTail);
 			drag = 1;
 			lift = 0;

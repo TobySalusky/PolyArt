@@ -16,7 +16,7 @@ public class Wings extends Part {
 
 	public static class PassengerWings extends Wings {
 
-		public PassengerWings(Vector pos, Model model) {
+		public PassengerWings(Vector pos) {
 			super(pos, Models.passengerWings);
 			weight = 2;
 			drag = 2;

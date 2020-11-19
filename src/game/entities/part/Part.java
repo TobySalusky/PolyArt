@@ -47,10 +47,6 @@ public class Part extends Entity {
 	@Override
 	public void render(Graphics g, Camera camera) {
 		super.render(g, camera);
-		if (snapPoint != null) {
-			g.setColor(Color.blue);
-			Gizmo.dot(g, snapPoint);
-		}
 	}
 
 	public void unclick() {
