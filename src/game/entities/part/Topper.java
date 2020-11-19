@@ -1,5 +1,6 @@
 package game.entities.part;
 
+import game.Models;
 import poly.Model;
 import util.Vector;
 
@@ -12,4 +13,17 @@ public class Topper extends Part {
 		snapPoint = model.backToPointLinked(1);
 	}
 
+	public static class HelicopterBlades extends Topper {
+
+		public HelicopterBlades(Vector pos) {
+			super(pos, Models.helicopterBlades);
+
+			clickAssist = true;
+
+			weight = 1F;
+			lift = 7;
+			thrust = 3;
+			drag = 1;
+		}
+	}
 }

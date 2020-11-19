@@ -42,7 +42,7 @@ public class NPC extends Entity {
 		addText("Various parts are scattered across the ground, as you can see.", 8);
 		addText("Parts only fit with other parts of types they are meant to attach to, but feel free to pick any part from each selection.", 14);
 		addText("Drag parts from the ground to the plus icons, to construct your aircraft, starting with a body-segment.", 10);
-		//addText("When you're happy with the combination you've made, try it out using the 'Simulate' button.", 10);
+		addText("It's generally best to aim to balance Lift and Weight, as well as Drag and Thrust.", 10);
 	}
 
 	public void addText(String text, float seconds) {

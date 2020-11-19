@@ -17,6 +17,8 @@ public class Entity implements GameObject {
 	public Model model;
 	private Vector lastPos = new Vector();
 
+	protected boolean clickAssist = false;
+
 	public Entity(Vector pos) {
 		this.pos = pos.copy();
 	}
@@ -27,7 +29,7 @@ public class Entity implements GameObject {
 	}
 
 	public boolean tryClick(Vector pos) {
-		if (model.pointCollision(pos)) {
+		if (model.pointCollision(pos) || (clickAssist && pos.subbed(this.pos).mag() < 60)) {
 			clicked(pos);
 			return true;
 		}

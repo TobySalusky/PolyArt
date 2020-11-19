@@ -51,6 +51,8 @@ public class BaseScreen implements GameScreen {
 
 		parts.add(new Tail.PassengerTail(new Vector(500, 0)));
 
+		parts.add(new Topper.HelicopterBlades(new Vector(500, 0)));
+
 		parts.add(new Wings.PassengerWings(new Vector(500, 0)));
 
 		for (int i = 0; i < 7; i++) {
@@ -206,8 +208,11 @@ public class BaseScreen implements GameScreen {
 		g.drawString("Lift", x, y+175);
 		g.drawString("Weight", x+width-125, y+175);
 
-		float xForce = (thrust-drag);
-		float yForce = (lift-weight);
+		float xForce = (drag - thrust);
+		float yForce = (weight - lift);
+
+		xForce = Maths.clamp(xForce, -10, 10);
+		yForce = Maths.clamp(yForce, -10, 10);
 
 		g.setColor(new Color((int)(25.5F*Math.abs(xForce)),(255-(int)(25.5F*Math.abs(xForce))),0));
 		g.fillRect((int)(x+(width/2)+(25*xForce)),y-5,notchWidth,height+10);
