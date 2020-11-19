@@ -30,5 +30,16 @@ public class Body extends Part {
 		}
 	}
 
+	public static class JetBody extends Body {
+
+		public JetBody(Vector pos, Model model) {
+			super(pos, Models.jetBody);
+			weight = 3;
+			drag = 2;
+			thrust = 0;
+			lift = 0;
+		}
+	}
+
 
 }
